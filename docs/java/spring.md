@@ -2,7 +2,7 @@
 =======
     单行文本框
     Test
-`<hello world>`
+`hello world`
 
 ## 标题
         test
