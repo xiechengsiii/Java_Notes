@@ -37,8 +37,10 @@
     注意==将日志缓冲写到日志文件==和==将日志持久化存储==是不同的， 前者只是将innodb的内存缓存转移到操作系统的缓存，并没有做到真正的持久化存储
 
     ![image-20200520100641550](C:\Users\XXX\AppData\Roaming\Typora\typora-user-images\image-20200520100641550.png)
+    
+    log Buffer 处于用户空间的内存， 要写到磁盘上的Log Files 要经过OS Buffer (当然 ， 如果开启了 0_Direct不需要）	
 
-​	``0_DIRECT`` 
+``0_DIRECT`` 
 
 ​	可以使OS不要缓存数据，也不做预读，这个选项完全关闭了操作系统缓存，使所有读写都直接通过
 
@@ -56,7 +58,17 @@
 
   通过预写日志将随机IO变为顺序IO
 
+3.几种日志
 
+参考这篇[文章](https://zhuanlan.zhihu.com/p/58011817)
+
+- redo log  事务日志,保证事务持久化的   同时减少了提交事务时的开销。随机IO变为顺序IO，不需要每个事务提交的时候都把缓冲池的脏块flush到磁盘中。
+
+- undo log  提供回滚，和MVCC功能
+
+- binlog  用于恢复数据，主从模式下用于复制。二进制日志（binary log）中记录了对MySQL数据库执行更改的所有操作并且记录了语句发生时间、执行时长、操作数据等其它额外信息。
+
+  除了上面介绍的几个作用外，binlog对于事务存储引擎的崩溃恢复也有非常重要的作用。在开启binlog的情况下，为了保证binlog与redo的一致性，MySQL将采用事务的两阶段提交协议。当MySQL系统发生崩溃时，事务在存储引擎内部的状态可能为prepared和commit两种。对于prepared状态的事务，是进行提交操作还是进行回滚操作，这时需要参考binlog：如果事务在binlog中存在，那么将其提交；如果不在binlog中存在，那么将其回滚，这样就保证了数据在主库和从库之间的一致性。
 
 ## 优化
 
@@ -112,6 +124,8 @@ innodb用日志把**随机IO变成顺序IO**（追加的方式写入），一旦
 3.readview
 
 ​	对于``READ UNCOMMITED``，直接读取最新的记录版本就行；``SERIALIZABLE``,使用加锁的方式来访问记录；``READ COMMITED``和``REAPEATABLE READ``就需要通过版本链和``readview``配合完成了，核心问题就是**判断版本链中哪个版本应该是当前事务应该读的**
+
+​	实际上版本并非物理存在的，而是通过undo log 计算出来的。
 
 ​	readview中比较重要的四个属性 ：
 
