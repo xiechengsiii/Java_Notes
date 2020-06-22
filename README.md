@@ -1,5 +1,5 @@
 JAVA学习笔记， 主要包括jvm, Mysql, Java基础,应用类框架等
-- [] 代办
+- [ ] 代办
 ### Java相关
 #### [javaBase](/docs/java/javaBase.md)
 #### [MySQL](/docs/java/MySQL.md)
