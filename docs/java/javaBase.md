@@ -60,9 +60,87 @@
 
 - LinkedHashMap 
 
+  ```java
+public class LinkedHashMap<K,V> extends HashMap<K,V> implements Map<K,V>
+  ```
+
   继承自HashMap，在HashMap的基础上，维护一条双向链表，可以保持遍历顺序和插入顺序一致；并且还能对访问顺序提供支持：当``accessOrder == true``,可以维护访问顺序。因此可以以LinkedHashMap为基础实现LRU缓存策略
 
   ​	内部类``Entry``有before和after两个指针，可以维护一个双向链表，保证遍历顺序和插入顺序一致。
+
+  详见这篇[文章]([http://www.tianxiaobo.com/2018/01/24/LinkedHashMap-%E6%BA%90%E7%A0%81%E8%AF%A6%E7%BB%86%E5%88%86%E6%9E%90%EF%BC%88JDK1-8%EF%BC%89/](http://www.tianxiaobo.com/2018/01/24/LinkedHashMap-源码详细分析（JDK1-8）/))
+  
+  利用LinkedHashMap实现LRU
+  
+  ```java
+  public class SimpleCache<K, V> extends LinkedHashMap<K, V> {
+  
+      private static final int MAX_NODE_NUM = 100;
+  
+      private int limit;
+  
+      public SimpleCache() {
+          this(MAX_NODE_NUM);
+      }
+  
+      public SimpleCache(int limit) {
+          super(limit, 0.75f, true);
+          this.limit = limit;
+      }
+  
+      public V save(K key, V val) {
+          return put(key, val);
+      }
+  
+      public V getOne(K key) {
+          return get(key);
+      }
+  
+      public boolean exists(K key) {
+          return containsKey(key);
+      }
+      
+      /**
+       * 判断节点数是否超限
+       * @param eldest
+       * @return 超限返回 true，否则返回 false
+       */
+      @Override
+      protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+        return size() > limit;
+      }
+  }
+  ```
+  
+  ```java
+  // putval方法有 afterNodeInsertion(evict)回调方法：
+  ...
+      if (++size > threshold) {...}
+      afterNodeInsertion(evict);    // 回调方法，后续说明
+      return null;
+  //linkedHashMap实现了这个方法：
+  void afterNodeInsertion(boolean evict) { // possibly remove eldest
+      LinkedHashMap.Entry<K,V> first;
+      // 根据条件判断是否移除最近最少被访问的节点
+      if (evict && (first = head) != null && removeEldestEntry(first)) {
+          K key = first.key;
+          removeNode(hash(key), key, null, false, true);
+      }
+  }
+  
+  // 移除最近最少被访问条件之一，通过覆盖此方法可实现不同策略的缓存
+  protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+      return false;
+  }
+  ```
+
+几种Map的总结：
+
+- HashMap底层基于拉链式的散列结构，并在JDK1.8中引入红黑树优化链表过长的问题。基于这样的结构，HashMap可以实现高效的增删改查
+- LinkedHashMap 在HashMap的基础上维护了一条双向链表，实现了散列数据结构的有序遍历
+- TreeMap底层基于红黑树的实现，实现了键值对的排序功能
+
+  
 
 - ArrayList
 
@@ -91,9 +169,6 @@
 
     
 
-    
-
-    
 
 
 
