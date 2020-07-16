@@ -6,6 +6,7 @@ JAVA学习笔记， 主要包括jvm, Mysql, Java基础,应用类框架等
 #### [JUC](/docs/java/JUC.md)
 #### [JVM](/docs/java/JVM.md)
 #### [Spring](/docs/java/spring.md)
+#### [Redis](/docs/java/Redis.md)
 #### [分布式](/docs/java/分布式.md)
 #### [拾贝](/docs/java/拾贝.md)
 ### 通用知识
