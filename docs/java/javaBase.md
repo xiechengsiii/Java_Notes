@@ -64,7 +64,7 @@
 public class LinkedHashMap<K,V> extends HashMap<K,V> implements Map<K,V>
   ```
 
-  继承自HashMap，在HashMap的基础上，维护一条双向链表，可以保持遍历顺序和插入顺序一致；并且还能对访问顺序提供支持：当``accessOrder == true``,可以维护访问顺序。因此可以以LinkedHashMap为基础实现LRU缓存策略
+  继承自HashMap，在HashMap的基础上，维护一条双向链表，可以保持**遍历顺序**和**插入顺序**一致(默认的)；并且还能对访问顺序提供支持：当``accessOrder == true``,可以维护访问顺序。因此可以以LinkedHashMap为基础实现LRU缓存策略
 
   ​	内部类``Entry``有before和after两个指针，可以维护一个双向链表，保证遍历顺序和插入顺序一致。
 
