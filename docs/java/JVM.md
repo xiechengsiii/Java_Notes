@@ -62,7 +62,7 @@
 
   ​	![img](E:\Typora\imgs\jmap.png)
 
-  但是jamp执行期间对进程造成很大影响，甚至卡顿：
+  但是jmap行期间对进程造成很大影响，甚至卡顿：
 
   ![img](E:\Typora\imgs\clipboard-1590232115277.png)
 
