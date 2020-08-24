@@ -1,12 +1,10 @@
-# JVM && JUC
+# JVM
 
 ## GC相关
 
-​	**1**.各种垃圾回收器
+​	**1**.各种垃圾回收器![img](E:\Typora\imgs\garbageCollector.png)
 
-​		![image-20200521214048109](E:\Typora\imgs\image-20200521214048109.png)
-
-​		各种垃圾回收器是配合使用的。		
+ 		各种垃圾回收器是配合使用的。		
 
 ​		随着内存的增大，GC在不断升级，ZGC是jdk11主推的。
 
@@ -70,9 +68,5 @@
 
 3.
 
-## JUC
 
-#### volatile
-
-volatile的MESI缓存一致性协议，需要不断地从主内存嗅探和CAS不断循环，无效交互会导致总线带宽达到峰值，所以不要大量使用volatile。
 

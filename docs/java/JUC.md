@@ -284,4 +284,9 @@ private Node addWaiter(Node mode) {
 
 - ``void park()``   阻塞当前线程，调用 unpark(Thread thread)或者当前线程被中断，才能从park方法返回
 
+### 同步关键字
+
+#### volatile
+
+volatile的MESI缓存一致性协议，需要不断地从主内存嗅探和CAS不断循环，无效交互会导致总线带宽达到峰值，所以不要大量使用volatile。
 
