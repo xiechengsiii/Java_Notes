@@ -339,12 +339,51 @@ public class SegmentTreeNode {
       public static void main(String[] args) {
           SnowFlake snowFlake = new SnowFlake(2, 3);
   
-          for (int i = 0; i < (1 << 12); i++) {
+          for (int i = 0; i
+               < (1 << 12); i++) {
               System.out.println(snowFlake.nextId());
           }
       }
   }
   ```
 
-  
+
+- 字符串匹配算法之KMP算法
+
+  指针不会回退，O(n) = m + n;
+
+```java
+public class KMP {
+    // AS  SA  A是前缀/后缀， A必须是非空串
+    //ababab  c    对于这个字符串  next[5] = 4  也就是模式串前字符前一个字符的最长公共前后缀
+    //ababab  a
+    int[] next;
+    public int kmp(String s, String p){
+        getNext(p, p);
+        int i = 0,  j = 0;
+        while (i < s.length() && j < p.length()){
+            if (j == -1 || s.charAt(i) == p.charAt(j)){
+                i++;
+                j++;
+            }
+            else j = next[j];
+        }
+        if ( j == p.length()) return i - j;
+        return -1;
+    }
+    private  void getNext(String p1, String p2){
+        next = new int[p1.length()];
+        next[0] = -1;
+        int i = 0, j = -1;
+        while ( i < p1.length() - 1){
+            if (j == -1 || p1.charAt(i) == p2.charAt(j)){
+                i++;
+                j++;
+                next[i] = j;
+            }
+            else j = next[j];
+        }
+    }
+}
+```
 
