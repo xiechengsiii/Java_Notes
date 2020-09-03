@@ -116,6 +116,8 @@ innodb用日志把**随机IO变成顺序IO**（追加的方式写入），一旦
 
 ## 事务与锁
 
+[参考这篇文章](https://tech.meituan.com/2014/08/20/innodb-lock.html)
+
 1.四种隔离级别
 
 ​	``READ UNCOMMITED``    ``READ COMMITED``   ``REAPEATABLE READ``   ``SERIALIZABLE``
@@ -230,4 +232,25 @@ innodb用日志把**随机IO变成顺序IO**（追加的方式写入），一旦
 
   
 
-  
+#   SQL语句
+
+1.``group by `` 配合 ``having``对分组过滤。注意，where是基于行过滤，group by是基于分组
+
+```mysql
+select vend_id, count(*) as num_prods from products where product_price > 10 group by  vend_id having count(*)  > 2;
+```
+
+2.做项目的时候要对项目日志做分析，要统计某一个时间段内，每一小时或者每一天的日志数据
+
+```mysql
+//每一天
+select DATA_FORMAT(trigger_time, '%Y-%m-%d') as triggerDay, count(id) as triggerCount from table 
+where day between '2020-02-02' and '2020-03-03' group by triggerDay order by trigger_time;
+
+//每一小时，可以用mysql自带的函数hour()
+select Hour(trigger_time) as Hour, count(*) as Count from table where trigger_time between '2018_02_15 01:18:16' and '2018-02-05 17:18:16' group by Hour order by Hour
+```
+
+![image-20200902085502667](E:\Typora\imgs\image-20200902085502667.png)
+
+![image-20200902085720523](E:\Typora\imgs\image-20200902085720523.png)
