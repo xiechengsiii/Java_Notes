@@ -100,13 +100,15 @@ public class UnionFind {
         return parent[x] == x ? x : (parent[x] = find(find(parent[x])));
     }
     //把小树挂在大树下面
-    void union(int x, int y){
-        if (size[x] > size[y]){
+  	 void union(int x, int y){
+        int xP = parent[x];
+        int yP = parent[y];
+        if (size[xP] > size[yP]){
             union( y, x);
         }
         else{
-            parent[x] = parent[y];
-            size[y] += size[x];
+            size[yP] += size[xP];
+           	parent[xP] = yP;
             cnt--;
         }
     }
