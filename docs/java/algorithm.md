@@ -1,6 +1,6 @@
 ## LeetCode相关
 
-1.Leetcode 491   标准的DFS列举一个集合中的所有组合
+- Leetcode 491   标准的DFS列举一个集合中的所有组合
 
 给定一个整型数组, 你的任务是找到所有该数组的递增子序列，递增子序列的长度至少是2。
 
@@ -72,6 +72,44 @@ class Solution {
 
 
 ```
+
+- 5505   有一个整数数组 ``nums ``，和一个查询数组 ``requests`` ，其中 ``requests[i] = [starti, endi] ``。第 i 个查询求 ``nums[starti] + nums[starti + 1] + ... + nums[endi - 1] + nums[endi]``的结果 ，``starti`` 和 ``endi`` 数组索引都是 从 0 开始 的。
+
+你可以任意排列`` nums`` 中的数字，请你返回所有查询结果之和的最大值。
+
+由于答案可能会很大，请你将它对`` 1e9 + 7`` 取余 后返回。
+
+**差分数组求频率**
+
+```java
+思路很简单，就是统计各个位置出现的频率，然后让频率最大的数尽可能取到的值大，但是统计频率这一步容易超时，可以用到查分数组，不需要遍历对每个位置进行统计：
+     int mod = (int)1e9 + 7;
+    public int maxSumRangeQuery(int[] nums, int[][] requests) {
+        int n = nums.length;
+        int[] delta = new int[n + 1];
+        //这里 差分求频率
+        for (int[] arr : requests){
+            delta[arr[0]]++;
+            delta[arr[1] + 1]--;
+        }
+        int[] count = new int[n];
+        count[0] = delta[0];
+        //根据差分数组
+        for (int i = 1; i < n; i++){
+            count[i] = count[i - 1] + delta[i];
+        }
+        Arrays.sort(count);
+        Arrays.sort(nums);
+        int res  = 0;
+        for (int i = n - 1; i >= 0; i--){
+            if (count[i] == 0) break;
+            res = (res + count[i] * nums[i]) % mod;
+        }
+        return res;
+    }
+```
+
+
 
 
 
