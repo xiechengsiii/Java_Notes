@@ -111,7 +111,35 @@ class Solution {
 
 
 
+- 332  	“一笔画问题” 欧拉图， 挺有意思的。
 
+  ```java
+  class Solution {
+      Map<String, Queue<String>> map;
+      List<String> res = new ArrayList<>();
+      public List<String> findItinerary(List<List<String>> tickets) {
+         map = new HashMap<>();
+         for (List<String> ticket : tickets){
+             Queue<String> pq = map.computeIfAbsent(ticket.get(0), k -> new PriorityQueue<>(String :: compareTo));
+             pq.offer(ticket.get(1));
+         }
+         dfs("JFK");
+         Collections.reverse(res);
+         return res;
+      }
+      private void dfs(String start){
+          while (map.containsKey(start) && map.get(start).size() > 0){
+              String next = map.get(start).poll();
+              dfs(next);
+          }
+          res.add(start);
+      }
+  }
+  ```
+
+  
+
+  
 
 ## 数据结构
 
