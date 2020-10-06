@@ -113,6 +113,7 @@ select是单线程处理了并发请求噢
 
 ```c
 int poll(struct pollfd *fds, nfds_t nfds, int timeout);
+//相当于将fd包装在了一个pollfd结构体中
 struct pollfd {
 int fd; /* 文件描述符 */
 short events; /* 监控的事件 */
@@ -135,13 +136,76 @@ timeout 毫秒级等待
 >0：等待指定毫秒数，如当前系统时间精度不够毫秒，向上取值
 ```
 
-
+相比于select，可以通过改变open files （``ulimit -n 65536``）将监控的fd调的很大（select只能是1024，改变的话很麻烦）
 
 ##### epoll
+
+相比于select的主要提升：
+
+- 它能显著提高程序在大量并发连接中只有**少量活跃**的情况下的系统CPU利用率，因为它会**复用文件描述符集合来传递结果而不用迫使开发者每次等待事件之前都必须重新准备要被侦听的文件描述符集合**  
+- 获取事件的时候，无须遍历整个被监听的描述符集，只要遍历那些被内核IO事件异步唤醒而加入Ready队列的文件描述符集
+
+###### 相关的API
+
+- epll_create(int size)
+
+  创建一个epoll句柄，参数size用来告诉内核监听的文件描述符个数，跟内存大小有关   
+
+  ```c
+  int epoll_create(int size)
+  //size：告诉内核监听的数目
+  ```
 
 **刚开始在内核空间中创建一颗红黑树，然后一次性把监听的描述符添加到这颗红黑树上。 然后剩下的就是等待，有响应的时候，红黑树就把 间让用户自己去处理，中间的都是一些红黑树的插入删除操作了**。
 
 ![image-20200918103419270](E:\Typora\imgs\image-20200918103419270.png)
+
+- epoll_ctl
+
+  注册fd，修改fd相关的事件，删除fd
+
+```c
+#include <sys/epoll.h>
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
+
+epfd：为epoll_creat的句柄
+op：表示动作，用3个宏来表示：
+EPOLL_CTL_ADD(注册新的fd到epfd)，
+EPOLL_CTL_MOD(修改已经注册的fd的监听事件)，
+EPOLL_CTL_DEL(从epfd删除一个fd)；
+fd：后面的event那个参数所对应的fd
+event：告诉内核需要监听的事件
+struct epoll_event {
+__uint32_t events; /* Epoll events */
+epoll_data_t data; /* User data variable */
+};
+EPOLLIN ：表示对应的文件描述符可以读（包括对端SOCKET正常关闭）
+EPOLLOUT：表示对应的文件描述符可以写
+EPOLLPRI：表示对应的文件描述符有紧急的数据可读（这里应该表示有带外数据到来）
+EPOLLERR：表示对应的文件描述符发生错误
+EPOLLHUP：表示对应的文件描述符被挂断；
+EPOLLET： 将EPOLL设为边缘触发(Edge Triggered)模式，这是相对于水平触发(Level Triggered)来
+说的
+EPOLLONESHOT：只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需
+要再次把这个socket加入到EPOLL队列里
+```
+
+- epoll_wait
+
+  等待监控的文件描述符上事件的产生，类似于select（）调用
+
+  ```c
+  int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
+  events：用来从内核得到事件的集合(传出参数)
+  maxevents：告之内核这个events有多大，这个maxevents的值不能大于创建epoll_create()时的size，
+  timeout：是超时时间
+  -1：阻塞
+  0：立即返回，非阻塞
+  >0：指定微秒
+  返回值：成功返回有多少文件描述符就绪，时间到时返回0，出错返回
+  ```
+
+  
 
 epoll 原理概述
 
