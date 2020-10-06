@@ -360,3 +360,13 @@ select Hour(trigger_time) as Hour, count(*) as Count from table where trigger_ti
 ![image-20200902085502667](E:\Typora\imgs\image-20200902085502667.png)
 
 ![image-20200902085720523](E:\Typora\imgs\image-20200902085720523.png)
+
+3.查询数据库表近7天的数据
+
+```mysql
+select count(*), date(create_time) as date from table where datediff(now(), create_time)
+<= 6 group by day(create_time);
+```
+
+
+
