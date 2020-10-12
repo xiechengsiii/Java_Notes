@@ -140,9 +140,7 @@ class Solution {
 
   ```
 
-  
-
-##### 有意思的dp
+##### DP
 
 ###### 树形dp
 
@@ -151,6 +149,38 @@ class Solution {
   不会做，只能学
 
 - 337 [House Robber III](https://leetcode-cn.com/problems/house-robber-iii/)
+
+###### 背包问题
+
+- 416 [ Partition Equal Subset Sum](https://leetcode-cn.com/problems/partition-equal-subset-sum/)
+
+  ```java
+  Input: nums = [1,5,11,5]
+  Output: true
+  Explanation: The array can be partitioned as [1, 5, 5] and [11].
+  ```
+
+  每个元素可以选或者不选， 我只想到了暴力dfs。 这其实判断是否可以从数组中选出一些数字，使得这些数字的和等于整个数组的元素和的一半。因此这个问题可以转换成**0-1背包问题**
+
+  ```java
+  
+  class Solution {
+      public boolean canPartition(int[] nums) {
+          int sum = 0;
+          for (int i : nums) sum += i;
+          if (sum % 2 == 1) return false;
+          int target = sum / 2;
+          boolean[] dp = new boolean[ target + 1];
+          dp[0] = true;
+          for (int i : nums){
+              for (int j = target; j >= i; j--){
+                  if ( dp[j - i]) dp[j] = true;
+              }
+          }
+          return dp[target];
+      }
+  }
+  ```
 
   
 
