@@ -1,6 +1,8 @@
 [TOC]
 
-## LeetCode相关
+
+
+##### LeetCode相关
 
 - Leetcode 491   标准的DFS列举一个集合中的所有组合
 
@@ -184,7 +186,7 @@ class Solution {
 
   
 
-## 数据结构
+##### 数据结构
 
 记录几种常用的，可以用于巧妙解题的数据结构
 
@@ -353,7 +355,7 @@ public class SegmentTreeNode {
 }
 ```
 
-## 算法相关
+##### 算法相关
 
 - 雪花算法
 
