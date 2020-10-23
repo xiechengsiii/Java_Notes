@@ -228,7 +228,7 @@ class Solution {
 
 记录几种常用的，可以用于巧妙解题的数据结构
 
-- **并查集**
+###### 并查集
 
 ```java
 public class UnionFind {
@@ -282,8 +282,7 @@ public class UnionFind {
 
  [5128. Graph Connectivity With Threshold](https://leetcode-cn.com/problems/graph-connectivity-with-threshold/)
 
-
-- **FenwickTree**
+######  FenwickTree
 
 又称树状数组。用于求前缀和，O（logn）, 做hard题目的时候遇到过几次，看了好几个小时，终于弄明白了
 
@@ -349,9 +348,7 @@ public class FenwickTree {
 
   这道题目暴力是可以想到并且做出来的。测试case不强，没有卡n^2.
 
-  
-
-- **线段树** 
+###### 线段树
 
 也可以用来求前缀和，还可以用来查找， 我用的不多，代码比较好理解：
 
