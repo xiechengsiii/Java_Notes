@@ -2,7 +2,7 @@
 
 
 
-##### LeetCode相关
+#### LeetCode
 
 - Leetcode 491   标准的DFS列举一个集合中的所有组合
 
@@ -142,6 +142,40 @@ class Solution {
 
   ```
 
+- [187. Repeated DNA Sequences](https://leetcode-cn.com/problems/repeated-dna-sequences/)
+
+  **Rabin-Karp算法**对字符串进行hash编码。详见这道题的官方题解
+
+  ```java
+  一种初始化map的方式  初始化工厂
+   static final Map<Character, String> map = Map.of(
+          '2', "abc", '3', "def", '4', "ghi", '5', "jkl",
+          '6', "mno", '7', "pqrs", '8', "tuv", '9', "wxyz"
+      );
+  ```
+
+  一样的题目还有[718. Maximum Length of Repeated Subarray](https://leetcode-cn.com/problems/maximum-length-of-repeated-subarray/)     
+
+  ​                         [1044. Longest Duplicate Substring](https://leetcode-cn.com/problems/longest-duplicate-substring/)
+  
+  求base进制的时候，往往会用到快速幂， 快速计算出x ^n % mod的值：
+  
+  ```java
+  public long qPow(long x, long n){
+      long ret = 1;
+      while (n != 0){
+          if ((n & 1) != 0){
+              ret = ret * x % mod;
+          }
+          x = x * x % mod;
+          n >>= 1;
+      }
+     	return ret;
+  }
+  ```
+  
+  
+
 ##### DP
 
 ###### 树形dp
@@ -184,13 +218,17 @@ class Solution {
   }
   ```
 
-  
+###### 状态压缩
 
-##### 数据结构
+- [1617. Count Subtrees With Max Distance Between Cities](https://leetcode-cn.com/problems/count-subtrees-with-max-distance-between-cities/)
+
+-  [1595. 连通两组点的最小成本](https://leetcode-cn.com/problems/minimum-cost-to-connect-two-groups-of-points/)
+
+#### 数据结构
 
 记录几种常用的，可以用于巧妙解题的数据结构
 
-- 并查集
+- **并查集**
 
 ```java
 public class UnionFind {
@@ -212,16 +250,22 @@ public class UnionFind {
     }
     //把小树挂在大树下面
   	 void union(int x, int y){
+         
         int xP = parent[x];
         int yP = parent[y];
-        if (size[xP] > size[yP]){
-            union( y, x);
+         if (xP != yP){
+            if (size[xP] > size[yP]){
+            	size[xP] += size[yP];
+                parent[yP] = parent[xP];
+                cnt--;
+        	}
+        	else{
+            	size[yP] += size[xP];
+           		parent[xP] = yP;
+            	cnt--;
+        	}
         }
-        else{
-            size[yP] += size[xP];
-           	parent[xP] = yP;
-            cnt--;
-        }
+      
     }
     
     boolean findAndUnion(int x, int y){
@@ -234,7 +278,12 @@ public class UnionFind {
 }
 ```
 
-- FenwickTree
+并查集的例题：
+
+ [5128. Graph Connectivity With Threshold](https://leetcode-cn.com/problems/graph-connectivity-with-threshold/)
+
+
+- **FenwickTree**
 
 又称树状数组。用于求前缀和，O（logn）, 做hard题目的时候遇到过几次，看了好几个小时，终于弄明白了
 
@@ -294,7 +343,15 @@ public class FenwickTree {
 }
 ```
 
-- 线段树 
+树状数组的例题：
+
+- [1505. Minimum Possible Integer After at Most K Adjacent Swaps On Dig](https://leetcode-cn.com/problems/minimum-possible-integer-after-at-most-k-adjacent-swaps-on-digits/)
+
+  这道题目暴力是可以想到并且做出来的。测试case不强，没有卡n^2.
+
+  
+
+- **线段树** 
 
 也可以用来求前缀和，还可以用来查找， 我用的不多，代码比较好理解：
 
@@ -355,7 +412,7 @@ public class SegmentTreeNode {
 }
 ```
 
-##### 算法相关
+#### 算法相关
 
 - 雪花算法
 
