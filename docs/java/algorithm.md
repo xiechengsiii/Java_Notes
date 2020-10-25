@@ -158,7 +158,7 @@ class Solution {
 
   ​                         [1044. Longest Duplicate Substring](https://leetcode-cn.com/problems/longest-duplicate-substring/)
   
-  求base进制的时候，往往会用到快速幂， 快速计算出x ^n % mod的值：
+  求base进制的时候，往往会用到**快速幂**， 快速计算出x ^n % mod的值：
   
   ```java
   public long qPow(long x, long n){
@@ -177,6 +177,10 @@ class Solution {
   
 
 ##### DP
+
+###### 我想不到的DP
+
+[1621. Number of Sets of K Non-Overlapping Line Segments](https://leetcode-cn.com/problems/number-of-sets-of-k-non-overlapping-line-segments/)
 
 ###### 树形dp
 
@@ -222,7 +226,50 @@ class Solution {
 
 - [1617. Count Subtrees With Max Distance Between Cities](https://leetcode-cn.com/problems/count-subtrees-with-max-distance-between-cities/)
 
+  Floyd算法
+
+  ```java
+   //floyd 求任意两点最短距离
+          for (int k = 0; k < n; k++){
+              for (int i = 0; i < n; i++){
+                  for (int j = 0; j < n; j++){
+                      if (dist[i][k] != INF  && dist[k][j] != INF){
+                          dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                      }
+                  }
+              }
+          }
+  ```
+
+  
+
 -  [1595. 连通两组点的最小成本](https://leetcode-cn.com/problems/minimum-cost-to-connect-two-groups-of-points/)
+
+##### 贪心思想
+
+leetcode上遇到过的贪心：
+
+[55. Jump Game](https://leetcode-cn.com/problems/jump-game/)
+
+[1024. Video Stitching](https://leetcode-cn.com/problems/video-stitching/)
+
+[948. Bag of Tokens](https://leetcode-cn.com/problems/bag-of-tokens/)
+
+##### 二分查找/bfs/dfs
+
+[5548. Path With Minimum Effort](https://leetcode-cn.com/problems/path-with-minimum-effort/)
+
+这道题可以用二分/并查集/dijkstra算法，可以仔细看看零神的题解，很经典
+
+- LeetCode 1102. 得分最高的路径（优先队列BFS/极大极小化 二分查找）
+- LeetCode 410. 分割数组的最大值（极小极大化 二分查找）
+- LeetCode 774. 最小化去加油站的最大距离（极小极大化 二分查找）
+- LeetCode 875. 爱吃香蕉的珂珂（二分查找）
+- LeetCode LCP 12. 小张刷题计划（二分查找）
+- LeetCode 1011. 在 D 天内送达包裹的能力（二分查找）
+- LeetCode 1062. 最长重复子串（二分查找）
+- LeetCode 5438. 制作 m 束花所需的最少天数（二分查找）
+- LeetCode 5489. 两球之间的磁力（极小极大化 二分查找）
 
 #### 数据结构
 
@@ -280,7 +327,7 @@ public class UnionFind {
 
 并查集的例题：
 
- [5128. Graph Connectivity With Threshold](https://leetcode-cn.com/problems/graph-connectivity-with-threshold/)
+ [1627. Graph Connectivity With Threshold](https://leetcode-cn.com/problems/graph-connectivity-with-threshold/)
 
 ######  FenwickTree
 
