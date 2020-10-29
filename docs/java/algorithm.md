@@ -182,6 +182,8 @@ class Solution {
 
 [1621. Number of Sets of K Non-Overlapping Line Segments](https://leetcode-cn.com/problems/number-of-sets-of-k-non-overlapping-line-segments/)
 
+[1621. 大小为 K 的不重叠线段的数目](https://leetcode-cn.com/problems/number-of-sets-of-k-non-overlapping-line-segments/)
+
 ###### 树形dp
 
 - 834 [Sum of Distances in Tree](https://leetcode-cn.com/problems/sum-of-distances-in-tree/)  
@@ -257,7 +259,9 @@ leetcode上遇到过的贪心：
 
 ##### 二分查找/bfs/dfs
 
-[5548. Path With Minimum Effort](https://leetcode-cn.com/problems/path-with-minimum-effort/)
+[1631. Path With Minimum Effort](https://leetcode-cn.com/problems/path-with-minimum-effort/)
+
+[778. 水位上升的泳池中游泳](https://leetcode-cn.com/problems/swim-in-rising-water/)
 
 这道题可以用二分/并查集/dijkstra算法，可以仔细看看零神的题解，很经典
 
