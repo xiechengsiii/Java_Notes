@@ -174,7 +174,9 @@ class Solution {
   }
   ```
   
-  
+- [381. Insert Delete GetRandom O(1) - Duplicates allowed](https://leetcode-cn.com/problems/insert-delete-getrandom-o1-duplicates-allowed/)
+
+  没想到。列表其实也能O(1)时间复杂度的删除的，找到对应的index（通过map    ），将其和list末尾元素交换再删除末尾元素，就可以实现O(1)的复杂度删除。
 
 ##### DP
 
@@ -184,6 +186,12 @@ class Solution {
 
 [1621. 大小为 K 的不重叠线段的数目](https://leetcode-cn.com/problems/number-of-sets-of-k-non-overlapping-line-segments/)
 
+[1639. 通过给定词典构造目标字符串的方案数](https://leetcode-cn.com/problems/number-of-ways-to-form-a-target-string-given-a-dictionary/)
+
+[1643. 第 K 条最小指令](https://leetcode-cn.com/problems/kth-smallest-instructions/)
+
+[514. 自由之路](https://leetcode-cn.com/problems/freedom-trail/)
+
 ###### 树形dp
 
 - 834 [Sum of Distances in Tree](https://leetcode-cn.com/problems/sum-of-distances-in-tree/)  
@@ -191,6 +199,16 @@ class Solution {
   不会做，只能学
 
 - 337 [House Robber III](https://leetcode-cn.com/problems/house-robber-iii/)
+
+###### 几种类似的dp
+
+[5551. 使字符串平衡的最少删除次数](https://leetcode-cn.com/problems/minimum-deletions-to-make-string-balanced/)
+
+[LCP 19. 秋叶收藏集](https://leetcode-cn.com/problems/UlBDOe/)
+
+跳跃相关的dp   往往也可以用记忆化搜索	
+
+[5552. 到家的最少跳跃次数](https://leetcode-cn.com/problems/minimum-jumps-to-reach-home/)
 
 ###### 背包问题
 
@@ -245,7 +263,15 @@ class Solution {
 
   
 
--  [1595. 连通两组点的最小成本](https://leetcode-cn.com/problems/minimum-cost-to-connect-two-groups-of-points/)
+- [1595. 连通两组点的最小成本](https://leetcode-cn.com/problems/minimum-cost-to-connect-two-groups-of-points/)
+
+-  [1655. 分配重复整数](https://leetcode-cn.com/problems/distribute-repeating-integers/)
+
+##### 排序
+
+[1030. 距离顺序排列矩阵单元格](https://leetcode-cn.com/problems/matrix-cells-in-distance-order/)
+
+这道题可以用桶排序
 
 ##### 贪心思想
 
@@ -257,13 +283,17 @@ leetcode上遇到过的贪心：
 
 [948. Bag of Tokens](https://leetcode-cn.com/problems/bag-of-tokens/)
 
+[5556. Furthest Building You Can Reach](https://leetcode-cn.com/problems/furthest-building-you-can-reach/)
+
+​	这道题二分也可以。当时想半天知道要用贪心去做，没想到怎么设计这种数据结构！！
+
 ##### 二分查找/bfs/dfs
 
 [1631. Path With Minimum Effort](https://leetcode-cn.com/problems/path-with-minimum-effort/)
 
-[778. 水位上升的泳池中游泳](https://leetcode-cn.com/problems/swim-in-rising-water/)
-
 这道题可以用二分/并查集/dijkstra算法，可以仔细看看零神的题解，很经典
+
+[778. 水位上升的泳池中游泳](https://leetcode-cn.com/problems/swim-in-rising-water/)
 
 - LeetCode 1102. 得分最高的路径（优先队列BFS/极大极小化 二分查找）
 - LeetCode 410. 分割数组的最大值（极小极大化 二分查找）
@@ -274,6 +304,22 @@ leetcode上遇到过的贪心：
 - LeetCode 1062. 最长重复子串（二分查找）
 - LeetCode 5438. 制作 m 束花所需的最少天数（二分查找）
 - LeetCode 5489. 两球之间的磁力（极小极大化 二分查找）
+
+[5563. 销售价值减少的颜色球](https://leetcode-cn.com/problems/sell-diminishing-valued-colored-balls/)
+
+第一反应是最大堆，贪心做，结果超时。没想到用二分。
+
+###### bfs
+
+[5552. 到家的最少跳跃次数](https://leetcode-cn.com/problems/minimum-jumps-to-reach-home/)
+
+##### 排列组合
+
+[5555. 统计字典序元音字符串的数目](https://leetcode-cn.com/problems/count-sorted-vowel-strings/)
+
+也可以用dp dfs   重点理解z神的排列组合方法
+
+[1643. 第 K 条最小指令](https://leetcode-cn.com/problems/kth-smallest-instructions/)
 
 #### 数据结构
 
@@ -332,6 +378,8 @@ public class UnionFind {
 并查集的例题：
 
  [1627. Graph Connectivity With Threshold](https://leetcode-cn.com/problems/graph-connectivity-with-threshold/)
+
+
 
 ######  FenwickTree
 
@@ -398,6 +446,28 @@ public class FenwickTree {
 - [1505. Minimum Possible Integer After at Most K Adjacent Swaps On Dig](https://leetcode-cn.com/problems/minimum-possible-integer-after-at-most-k-adjacent-swaps-on-digits/)
 
   这道题目暴力是可以想到并且做出来的。测试case不强，没有卡n^2.
+  
+- [327. Count of Range Sum](https://leetcode-cn.com/problems/count-of-range-sum/)
+
+  用归并排序的思想，线段数组也可以做。可以参考题解区的题解以及零神的讲解。
+
+  **频数数组**
+  很多数据结构都是基于「频数数组」。
+
+  给定数组 tt 以及它的下标范围[L, R]，t[x] 就表示元素 **x**在数据结构中的出现次数。基于此，上述的两个操作可以变为：
+
+  操作 11「查询」：给定一个范围 [left,right]，查询 [left] 到 [right] 的和；
+
+  操作 22「更新」：给定一个元素 x，将 t[x] 增加 1。
+
+  这也是线段树和树状数组的基础，它们需要的空间都与数组 t 的下标范围 [L,R] 正相关。在本题数据规模较大的情况下（例如测试数据中，出现了元素值达到 32 位有符号整数的上下界），线段树和树状数组都会超出空间限制，因此需要借助**「离散化」**操作，将这些元素映射到一个较小规模的区间内。
+
+  **离散化**
+  给定数组元素[1,22,333,4444,55555]，如果我们只关注它们之间的大小关系，那么该数组其实和 [1, 2, 3, 4, 5] 是等价的。
+
+  这就是离散化的技巧。我们将所有会涉及到比较操作的数全部放入一个列表中，进行排序，再从小到大依次给它们赋予一个新的值。在离散化完成后，任何两个数之间的相对大小都不会改变，但是元素的上下界范围被限制住，这使得我们可以方便地使用一些数据结构。
+
+- [5564. 通过指令创建有序数组](https://leetcode-cn.com/problems/create-sorted-array-through-instructions/)
 
 ###### 线段树
 
@@ -459,6 +529,10 @@ public class SegmentTreeNode {
     }
 }
 ```
+
+例题
+
+[327. Count of Range Sum](https://leetcode-cn.com/problems/count-of-range-sum/)
 
 #### 算法相关
 
