@@ -37,7 +37,7 @@
 
    所以如何将数组正确的转化成一个`java.util.ArrayList`？
 
-   ```java
+   ``` java
    // 1.最简便的方法
        List list = new ArrayList<>(Arrays.asList("a","b", "c"));
    
@@ -47,6 +47,30 @@
    //基本类型也可以实现转换（依赖boxed的装箱操作）
    int [] myArray2 = { 1, 2, 3 };
    List myList = Arrays.stream(myArray2).boxed().collect(Collectors.toList());
+   
+   //给你一个整数数组 nums ，请你将数组按照每个值的频率 升序 排序。如果有多个值的频率相同，请你按照数值本身将它们 降序 排序。 
+   // Arrays.sort( )  只能对对象数组进行排序  因此需要将int数组转化为Integer数组
+   //这就要用到java8的新语法了， 其他写法都太丑陋了
+   
+    public int[] frequencySort(int[] nums) {
+           Map<Integer,Integer> map = new HashMap<>();
+           for(int num : nums){
+               map.put(num,map.getOrDefault(num,0) + 1);
+           }
+   
+           //转化为Integer[] 数组
+           Integer[] integers = Arrays.stream(nums).boxed().toArray(Integer[]::new);
+   
+           //自定义排序
+           Arrays.sort(integers, (a, b) -> map.get(a)==map.get(b)? b-a :map.get(a)-map.get(b));
+   
+           //转化为int[] 数组
+           return Arrays.stream(integers).mapToInt(Integer::valueOf).toArray();
+       }
+   
+   //数组中元素的最大值
+   int[] nums;
+   int maxVal = Arrays.stream(nums).max().getAsInt();
    ```
 
 7.注解的原理
