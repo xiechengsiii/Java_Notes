@@ -333,6 +333,14 @@ for (int y = x; y != 0; y = (x & (y - 1)){
 
 [5614. Find the Most Competitive Subsequence](https://leetcode-cn.com/problems/find-the-most-competitive-subsequence/)
 
+[456. 132模式](https://leetcode-cn.com/problems/132-pattern/)
+
+这道题挺难想的，好好领会吧。
+
+[5631. 跳跃游戏 VI](https://leetcode-cn.com/problems/jump-game-vi/)
+
+模板题，利用单调队列维护最大值，降低复杂度。
+
 ##### 贪心思想
 
 leetcode上遇到过的贪心：
@@ -356,6 +364,16 @@ leetcode上遇到过的贪心：
 我想的方法复杂了，get到了那个点，其实完全可以不借助优先队列或者多次数组排序，直接贪心一步到位的。
 
 [1675. 数组的最小偏移量](https://leetcode-cn.com/problems/minimize-deviation-in-array/)
+
+[649. Dota2 参议院](https://leetcode-cn.com/problems/dota2-senate/)
+
+[376. 摆动序列](https://leetcode-cn.com/problems/wiggle-subsequence/)
+
+dp, greedy都可
+
+[5611. 石子游戏 VI](https://leetcode-cn.com/problems/stone-game-vi/)
+
+看错题目了，题目看仔细点。不过就算看对了题目， 感觉也不一定能做出来:sweat:
 
 ##### 二分查找/bfs/dfs
 
@@ -482,16 +500,26 @@ public boolean exists(TreeNode root, int level, int k) {
           }
   
           List<Integer> ans = new ArrayList();
-          for (int i = 0; i < N; ++i) if (safe[i])
+          for (int i = 0; i < N; ++i) if 
+              (safe[i])
               ans.add(i);
   
           return ans;
       }
   
   
-  ```
-
+```
   
+
+##### 并查集
+
+[5632. 检查边长度限制的路径是否存在。](https://leetcode-cn.com/problems/checking-existence-of-edge-length-limited-paths/)
+
+	离线查找 + 并查集  。感觉挺经典的。离线的意思：「离线」的意思是，对于一道题目会给出若干询问，而这些询问是全部提前给出的，也就是说，你不必按照询问的顺序依次对它们进行处理，而是可以按照某种顺序（例如全序、偏序（拓扑序）、树的 DFS 序等）或者把所有询问看成一个整体（例如整体二分、莫队算法等）进行处理。
+	与「离线」相对应的是「在线」思维，即所有的询问是依次给出的，在返回第 k 个询问的答案之前，不会获得第 k+1个询问。
+	来源：zerotrac
+
+
 
 ##### 排列组合
 
