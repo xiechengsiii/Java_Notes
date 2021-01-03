@@ -341,6 +341,12 @@ for (int y = x; y != 0; y = (x & (y - 1)){
 
 模板题，利用单调队列维护最大值，降低复杂度。
 
+##### 优先队列
+
+###### [5638. 吃苹果的最大数目](https://leetcode-cn.com/problems/maximum-number-of-eaten-apples/)
+
+​	想用差分的思想做，过了 但是是错的。 只能优先队列。
+
 ##### 贪心思想
 
 leetcode上遇到过的贪心：
@@ -375,6 +381,10 @@ dp, greedy都可
 
 看错题目了，题目看仔细点。不过就算看对了题目， 感觉也不一定能做出来:sweat:
 
+[330. 按要求补齐数组](https://leetcode-cn.com/problems/patching-array/)
+
+没思路，一脸懵逼.jpg
+
 ##### 二分查找/bfs/dfs
 
 [1631. Path With Minimum Effort](https://leetcode-cn.com/problems/path-with-minimum-effort/)
@@ -401,7 +411,8 @@ dp, greedy都可
 
 ```java
 //这也能二分  首先确定出节点数目的上下限， 然后进行二分
-//这里有一个确定节点是否存在于完全二叉树的方法，通过左右节点0 ，1 对节点进行编号， 确定节点是否存在于完全二叉树中：
+//如果第 k 个节点位于第 h层，则 k 的二进制表示包含 h+1位，其中最高位是 1，其余各位从高到低表示从根节点到第 k 个节点的路径，0 表示移动到左子节点，1 表示移动到右子节点。
+
 // level  层数， 从0开始    k 节点的编号, 从1开始
 public boolean exists(TreeNode root, int level, int k) {
         int bits = 1 << (level - 1);
@@ -414,10 +425,80 @@ public boolean exists(TreeNode root, int level, int k) {
             }
             bits >>= 1;
         }
+	return node != null;
+}
 
 ```
 
 ![fig1](https://assets.leetcode-cn.com/solution-static/222/1.png)
+
+[5643. 将数组分成三个子数组的方案数](https://leetcode-cn.com/problems/ways-to-split-array-into-three-subarrays/)
+
+​	最直观的想法超时. debug了好久。 这道题目细节太多了！！！
+
+​	**得重复做**
+
+```java
+class Solution {
+    int mod = (int)1e9 +7;
+    public int waysToSplit(int[] nums) {
+        int n = nums.length;
+        int[] preSum = new int[n + 1];
+        for (int i = 0;  i < n; i++){
+            preSum[i + 1] = preSum[i] + nums[i];
+        }
+        int res = 0;
+        for (int i = 0; i < n - 2; i++){
+            // [0, i]
+            int a = preSum[i + 1];
+            
+            int lo = i + 1, hi = n - 2;
+            int x = -1, y = -1;
+            while (lo <= hi ){
+                int mid = lo + ((hi - lo) >> 1);
+                //[i + 1, x];
+                if (preSum[mid + 1] - a  < a){
+                    lo = mid + 1;
+                }
+                else{
+                    x  = mid;
+                    hi = mid  -1;
+                }
+            }
+            //注意 这里 如果 l = i+ 1 就错了 
+            // 如果写成 l = i + 1, 下面的判断条件就必须加上 y >= x;
+            // fuck 全是细节
+             lo = x;
+             hi = n - 2;
+            while (lo <=  hi){
+                int mid = lo + ((hi - lo) >> 1);
+                // [mid + 1, n - 1]                  // [i + 1, mid];
+                if (preSum[n] - preSum[mid + 1] < preSum[mid + 1] - a){
+                    hi = mid - 1;
+                }
+                else{
+                    //[i + 1, y]
+                    y = mid;
+                    lo = mid + 1;
+                }
+            }
+            // 如果写成lo = i + 1, 需要加判断条件 y >= x;
+             if (x != -1 && y != -1){
+                 res += y- x + 1 ;
+                 res %= mod;
+             }
+          
+        }
+        return res;
+    }
+}
+```
+
+
+
+
+
+ 
 
 ###### bfs
 
@@ -508,6 +589,7 @@ public boolean exists(TreeNode root, int level, int k) {
       }
   
   
+  ```
 ```
   
 
@@ -551,7 +633,7 @@ public boolean exists(TreeNode root, int level, int k) {
 
 **快速幂**
 
-```java
+​```java
 public long qPow(long x, long n){
     long ret = 1;
     while (n != 0){
