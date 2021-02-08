@@ -37,6 +37,8 @@
 
    所以如何将数组正确的转化成一个`java.util.ArrayList`？
 
+   
+
    ``` java
    // 1.最简便的方法
        List list = new ArrayList<>(Arrays.asList("a","b", "c"));
@@ -73,9 +75,62 @@
    int maxVal = Arrays.stream(nums).max().getAsInt();
    ```
 
+- 一些新语法
+
+```java
+        for (int i = 0; i < len; i++) {
+            int root = unionFind.find(i);
+//            if (hashMap.containsKey(root)) {
+//                hashMap.get(root).offer(charArray[i]);
+//            } else {
+//                PriorityQueue<Character> minHeap = new PriorityQueue<>();
+//                minHeap.offer(charArray[i]);
+//                hashMap.put(root, minHeap);
+//            }
+            // 上面六行代码等价于下面一行代码，JDK 1.8 以及以后支持下面的写法
+      hasMap.computeIfAbsent(root, key -> new PriorityQueue<>()).offer(charArray[i]);
+        }
+
+```
+
+##### 错误
+
+- 一些我遇到过的错误，de好久没找出来
+
+```java
+//Arrays.fill(Object[] a, Object val);
+List[] arr = new List[n];
+//我想每个位置都初始化一个新的new ArrayList
+//结果想当然的 
+Arrays.fill(arr, new ArrayList<>());   //wrong
+//这是错的，所有位置共用了一个ArrayList
+//正确：
+for (int i = 0; i < n; i++){
+    arr[i] = new ArrayList<>();
+}
+
+```
+
+-  关于比较器
+
+```java
+//正确
+Queue<Integer> pq = new  PriorityQueue<>((a, b) -> b.compareTo(a));
+//错误
+Queue<Integer> pq = new  PriorityQueue<>((a, b) -> b - a);
+//因为第二种写法， 有可能遇到整型溢出导致结果不正确
+// debug了好久没发现
+```
+
+
+
+
+
 7.注解的原理
 
    [这篇文章](https://cloud.tencent.com/developer/article/1172371)
+
+
 
 8.fail-fast 和 fail-safe
 

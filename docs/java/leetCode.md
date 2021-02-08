@@ -242,6 +242,10 @@ class Solution {
   }
   ```
 
+[1751. 最多可以参加的会议数目 II](https://leetcode-cn.com/problems/maximum-number-of-events-that-can-be-attended-ii/)
+
+​	这其实类似一个背包问题 ,  01背包 + LIS
+
 ###### 状态压缩
 
 - [1617. Count Subtrees With Max Distance Between Cities](https://leetcode-cn.com/problems/count-subtrees-with-max-distance-between-cities/)
@@ -309,11 +313,13 @@ for (int y = x; y != 0; y = (x & (y - 1)){
         对应的补集s = x ^ y;
         
 }
-     
-    
 ```
 
+[5639. 完成所有工作的最短时间](https://leetcode-cn.com/problems/find-minimum-time-to-finish-all-jobs/)
 
+ 周赛的时候傻逼了，``dp[k][1 << n]``  即可表示状态， 非弄了个``dp[1 <<k][1 << n]``
+
+另外，做题的时候想清楚，想好了再敲，节省时间多了，不要急。
 
 ##### 排序
 
@@ -325,7 +331,11 @@ for (int y = x; y != 0; y = (x & (y - 1)){
 
 ​	经典的桶排序，可以当模板使用。
 
-##### 单调队列
+##### 拓扑排序
+
+[1203. 项目管理](https://leetcode-cn.com/problems/sort-items-by-groups-respecting-dependencies/)
+
+官方题解区有很多相关练习
 
 [239. Sliding Window Maximum](https://leetcode-cn.com/problems/sliding-window-maximum/)
 
@@ -343,7 +353,7 @@ for (int y = x; y != 0; y = (x & (y - 1)){
 
 ##### 优先队列
 
-###### [5638. 吃苹果的最大数目](https://leetcode-cn.com/problems/maximum-number-of-eaten-apples/)
+[5638. 吃苹果的最大数目](https://leetcode-cn.com/problems/maximum-number-of-eaten-apples/)
 
 ​	想用差分的思想做，过了 但是是错的。 只能优先队列。
 
@@ -512,7 +522,7 @@ class Solution {
 
 ​	题解多重方法  也是一个多源bfs，和542一样
 
-###### dfs
+###### dfs && 回溯
 
 - 一道很经典的判断途中是否有环  可以转化为拓扑排序或者dfs
 
@@ -590,8 +600,22 @@ class Solution {
   
   
   ```
-```
-  
+
+  [5635. 构建字典序最大的可行序列](https://leetcode-cn.com/problems/construct-the-lexicographically-largest-valid-sequence/)
+
+
+
+##### 滑动窗口
+
+[424. 替换后的最长重复字符](https://leetcode-cn.com/problems/longest-repeating-character-replacement/)
+
+[1004. 最大连续1的个数 III](https://leetcode-cn.com/problems/max-consecutive-ones-iii/)
+
+​	注意里面的写法：用``if``还是``while``， 写法是略有差别的。
+
+[978. 最长湍流子数组](https://leetcode-cn.com/problems/longest-turbulent-subarray/)
+
+​	最容易想到的是dp。
 
 ##### 并查集
 
@@ -601,15 +625,54 @@ class Solution {
 	与「离线」相对应的是「在线」思维，即所有的询问是依次给出的，在返回第 k 个询问的答案之前，不会获得第 k+1个询问。
 	来源：zerotrac
 
+[399. 除法求值](https://leetcode-cn.com/problems/evaluate-division/)
 
+官方题解还给力一系列相似题目，可以练习一下。
+
+[1202. 交换字符串中的元素](https://leetcode-cn.com/problems/smallest-string-with-swaps/)
+
+[1722. 执行交换操作后的最小汉明距离](https://leetcode-cn.com/problems/minimize-hamming-distance-after-swap-operations/)
+
+上面两题比较像
+
+[803. 打砖块](https://leetcode-cn.com/problems/bricks-falling-when-hit/)
+
+[1584. 连接所有点的最小费用](https://leetcode-cn.com/problems/min-cost-to-connect-all-points/)
+
+Prim && Kruskal
+
+prim 是一个动态的过程，每次先将最小到生成树距离的边加入最小生成树，然后更新其他点到树的最小距离，直到所有点都加入到树；
+
+Kruskal是每次都添加最小的边，通过并查集，将不同区域的边连在一起直到所有边都在一个集合中。
 
 ##### 排列组合
 
-[5555. 统计字典序元音字符串的数目](https://leetcode-cn.com/problems/count-sorted-vowel-strings/)
+[1641. 统计字典序元音字符串的数目](https://leetcode-cn.com/problems/count-sorted-vowel-strings/)
 
 也可以用dp dfs   重点理解z神的排列组合方法
 
 [1643. 第 K 条最小指令](https://leetcode-cn.com/problems/kth-smallest-instructions/)
+
+[5648. 生成乘积数组的方案数](https://leetcode-cn.com/problems/count-ways-to-make-array-with-product/)
+
+这里用到一个快速得到质数的方法：
+
+```java
+		//找10000以内的所有质数
+		int[] aux = new int[10001];
+        Arrays.fill(aux, 1);
+        List<Integer> primes = new ArrayList<>();
+        for (int i = 2; i <= 10000; i++){
+            if (aux[i] == 1){
+                primes.add(i);
+            }
+            for (int j = 2 * i; j <= i * i && j <= 10000; j += i){
+                aux[j] = 0;
+            }
+        }
+```
+
+
 
 ##### 前缀和相关
 
@@ -617,11 +680,21 @@ class Solution {
 
 [1423. 可获得的最大点数](https://leetcode-cn.com/problems/maximum-points-you-can-obtain-from-cards/)
 
+[5662. 满足三条件之一需改变的最少字符数](https://leetcode-cn.com/problems/change-minimum-characters-to-satisfy-one-of-three-conditions/)
+
+​	这道题但是想了半天没做出来。枚举真是一门艺术。
+
 ##### 分治思想
 
 [395. 至少有K个重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters/)
 
 ​	多路分治
+
+##### 字典树
+
+[1707. 与数组中元素的最大异或值](https://leetcode-cn.com/problems/maximum-xor-with-an-element-from-array/)
+
+ 离线思想 + 01字典树
 
 ##### 涉及位运算
 
@@ -633,7 +706,7 @@ class Solution {
 
 **快速幂**
 
-​```java
+```java
 public long qPow(long x, long n){
     long ret = 1;
     while (n != 0){
@@ -648,4 +721,44 @@ public long qPow(long x, long n){
 ```
 
 
+
+##### 数学
+
+[1703. 得到连续 K 个 1 的最少相邻交换次数](https://leetcode-cn.com/problems/minimum-adjacent-swaps-for-k-consecutive-ones/)
+
+##### 找内在规律
+
+[5647. 解码异或后的排列](https://leetcode-cn.com/problems/decode-xored-permutation/)   
+
+[5658. 任意子数组和的绝对值的最大值](https://leetcode-cn.com/problems/maximum-absolute-sum-of-any-subarray/)	
+
+​	这个完全可以转化为求子数组的最大和和最小和， 和53一样。
+
+
+
+##### 一些小技巧
+
+- 枚举一个数组中所有子序列的和
+
+```java
+// 枚举nums数组所有子序列和
+int n  = nums.length;
+int[] arr = new int[1 << n];
+for (int i = 0; i < n; i++){
+    int offset = 1 << i;
+    for (int j = 0; j < offset){
+        arr[j + offset] = arr[j] + nums[i];
+    }
+}
+```
+
+- 枚举子集和补集
+
+```java
+// i  的子集  1111111  1代表选择该元素
+for (int j  = i; j > 0; j = (j - 1) & i){
+    // v 补集
+    v = j ^ i; (或者 j - i);
+}
+```
 
