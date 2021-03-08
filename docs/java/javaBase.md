@@ -1,4 +1,4 @@
-##  JAVA语言相关
+##  	JAVA语言相关
 
 1. ```java
    //System.out :: println 是一个方法引用，其等价于 x -> System.out.println(x)

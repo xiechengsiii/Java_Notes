@@ -115,6 +115,8 @@ class Solution {
 
 [1674. 使数组互补的最少操作次数](https://leetcode-cn.com/problems/minimum-moves-to-make-array-complementary/)
 
+[995. K 连续位的最小翻转次数](https://leetcode-cn.com/problems/minimum-number-of-k-consecutive-bit-flips/)
+
 - 332  	“一笔画问题” 欧拉图， 挺有意思的。
 
   ```java
@@ -179,6 +181,10 @@ class Solution {
   没想到。列表其实也能O(1)时间复杂度的删除的，找到对应的index（通过map    ），将其和list末尾元素交换再删除末尾元素，就可以实现O(1)的复杂度删除。
 
 ##### DP
+
+229周赛的后三题全是dp，可以看看。
+
+[131. 分割回文串](https://leetcode-cn.com/problems/palindrome-partitioning/)
 
 ###### 我想不到的DP
 
@@ -321,6 +327,10 @@ for (int y = x; y != 0; y = (x & (y - 1)){
 
 另外，做题的时候想清楚，想好了再敲，节省时间多了，不要急。
 
+[5690. 最接近目标价格的甜点成本](https://leetcode-cn.com/problems/closest-dessert-cost/)
+
+dfs/状态压缩
+
 ##### 排序
 
 [1030. 距离顺序排列矩阵单元格](https://leetcode-cn.com/problems/matrix-cells-in-distance-order/)
@@ -356,6 +366,12 @@ for (int y = x; y != 0; y = (x & (y - 1)){
 [5638. 吃苹果的最大数目](https://leetcode-cn.com/problems/maximum-number-of-eaten-apples/)
 
 ​	想用差分的思想做，过了 但是是错的。 只能优先队列。
+
+##### 单调栈
+
+[1776. 车队 II](https://leetcode-cn.com/problems/car-fleet-ii/)
+
+这个不会，当时做的时候懵逼，看了解答结果思路并不难
 
 ##### 贪心思想
 
@@ -400,6 +416,10 @@ dp, greedy都可
 [1631. Path With Minimum Effort](https://leetcode-cn.com/problems/path-with-minimum-effort/)
 
 这道题可以用二分/并查集/dijkstra算法，可以仔细看看零神的题解，很经典
+
+[743. 网络延迟时间](https://leetcode-cn.com/problems/network-delay-time/)
+
+最短路
 
 [778. 水位上升的泳池中游泳](https://leetcode-cn.com/problems/swim-in-rising-water/)
 
@@ -522,6 +542,8 @@ class Solution {
 
 ​	题解多重方法  也是一个多源bfs，和542一样
 
+[773. 滑动谜题](https://leetcode-cn.com/problems/sliding-puzzle/)
+
 ###### dfs && 回溯
 
 - 一道很经典的判断途中是否有环  可以转化为拓扑排序或者dfs
@@ -616,6 +638,10 @@ class Solution {
 [978. 最长湍流子数组](https://leetcode-cn.com/problems/longest-turbulent-subarray/)
 
 ​	最容易想到的是dp。
+
+[992. Subarrays with K Different Integers](https://leetcode-cn.com/problems/subarrays-with-k-different-integers/)
+
+[995. K 连续位的最小翻转次数](https://leetcode-cn.com/problems/minimum-number-of-k-consecutive-bit-flips/)
 
 ##### 并查集
 
