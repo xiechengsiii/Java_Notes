@@ -186,6 +186,10 @@ class Solution {
 
 [131. 分割回文串](https://leetcode-cn.com/problems/palindrome-partitioning/)
 
+[115. 不同的子序列](https://leetcode-cn.com/problems/distinct-subsequences/)
+
+[1269. 停在原地的方案数](https://leetcode-cn.com/problems/number-of-ways-to-stay-in-the-same-place-after-some-steps/)
+
 ###### 我想不到的DP
 
 [1621. Number of Sets of K Non-Overlapping Line Segments](https://leetcode-cn.com/problems/number-of-sets-of-k-non-overlapping-line-segments/)
@@ -251,6 +255,103 @@ class Solution {
 [1751. 最多可以参加的会议数目 II](https://leetcode-cn.com/problems/maximum-number-of-events-that-can-be-attended-ii/)
 
 ​	这其实类似一个背包问题 ,  01背包 + LIS
+
+[474. 一和零](https://leetcode-cn.com/problems/ones-and-zeroes/)
+
+```java
+ 01背包问题和完全背包问题
+01： 每个物品只能用一次
+for i = 1, 2, ..., n:          # 枚举前 i 个物品
+    for v = 0, 1, ..., V:             # 枚举体积
+        f[i][v] = f[i-1][v];        # 不选第 i 个物品
+        if v >= c[i]:              # 第 i 个物品的体积必须小于 v 才能选
+            f[i][v] = max(f[i][v], f[i-1][v-c[i]] + w[i])
+return max(f[n][0...V])      #  返回前 n 个物品的最大值
+
+
+优化方法
+for i = 1, 2, ..., n: # 枚举前 i 个物品
+    for v = V, V-1, ..., c[i]: # 注意这里是倒序遍历，
+            f[v] = max(f[v], f[v-c[i]] + w[i])
+return f[V] # 返回前 n 个物品时的最大值，为体积小于等于 V 时的最大价值
+
+
+这里必须是倒序，因为每一个物品只能用词， f[v-c[i]] 其实相当于 f[i-1][v- c[i]]
+由于是倒序的，更新的f[v-c[i]]不会对后面更新的f[v-c[i]]造成影响
+
+而完全背包问题：
+for i = 1, 2, ..., n: # 枚举前 i 个物品
+    for v = 0, 1, ..., V: # 注意这里是正序遍历，
+            f[v] = max(f[v], f[v-c[i]] + w[i])
+return f[V] # 返回前 n 个物品时的最大值，为体积小于等于 V 时的最大价值
+
+这里需要正序：
+f[v-c[i]] 相当于  f[i][v- c[i]]
+随着v的更新， f[v-c[i]] 会后对面的更新造成影响， 也就是说， 比如对于01背包， 每次更新， f[v-c[i]]永远还是存储着上一层（i - 1）的值，由于是倒着更新的，每次都是用到上一层的状态，也就是说物品i 只会使用一次；
+
+而完全背包， 由于v是从小到大正着遍历，对于f[v-c[i]] 的每次更新， 由于后面的大的v的计算会用到小的已经更新过的f[v-c[i]]，因此相当于物品i用了多次，而不是如同01问题一样物品i永远都只是用一次。
+```
+
+[1049. 最后一块石头的重量 II](https://leetcode-cn.com/problems/last-stone-weight-ii/)
+
+没想到
+
+[879. 盈利计划](https://leetcode-cn.com/problems/profitable-schemes/)
+
+```java
+//1
+class Solution {
+    public int profitableSchemes(int n, int minProfit, int[] group, int[] profit) {
+        int len = group.length, MOD = (int)1e9 + 7;
+        int[][][] dp = new int[len + 1][n + 1][minProfit + 1];
+        dp[0][0][0] = 1;
+        for (int i = 1; i <= len; i++) {
+            int members = group[i - 1], earn = profit[i - 1];
+            for (int j = 0; j <= n; j++) {
+                for (int k = 0; k <= minProfit; k++) {
+                    if (j < members) {
+                        dp[i][j][k] = dp[i - 1][j][k];
+                    } else {
+                        dp[i][j][k] = (dp[i - 1][j][k] + dp[i - 1][j - members][Math.max(0, k - earn)]) % MOD;
+                    }
+                }
+            }
+        }
+        int sum = 0;
+        for (int j = 0; j <= n; j++) {
+            sum = (sum + dp[len][j][minProfit]) % MOD;
+        }
+        return sum;
+    }
+}
+
+//2
+class Solution {
+    public int profitableSchemes(int n, int minProfit, int[] group, int[] profit) {
+        int[][] dp = new int[n + 1][minProfit + 1];
+        for (int i = 0; i <= n; i++) {
+            dp[i][0] = 1;
+        }
+        int len = group.length, MOD = (int)1e9 + 7;
+        for (int i = 1; i <= len; i++) {
+            int members = group[i - 1], earn = profit[i - 1];
+            for (int j = n; j >= members; j--) {
+                for (int k = minProfit; k >= 0; k--) {
+                    dp[j][k] = (dp[j][k] + dp[j - members][Math.max(0, k - earn)]) % MOD;
+                }
+            }
+        }
+        return dp[n][minProfit]; 
+        
+    }
+}
+//注意方法1中是累加，而方法2中非累加。这是dp中定义的边界条件不同
+// dp[j][0] = 1  实际上表示的是， 暗dp[0][j][0] ，也就是当边界条件为不选任何工作时，最多
+//使用j个人时，利润至少为0的方案数
+
+```
+
+
 
 ###### 状态压缩
 
@@ -361,17 +462,21 @@ dfs/状态压缩
 
 模板题，利用单调队列维护最大值，降低复杂度。
 
+[5753. 有向图中最大颜色值](https://leetcode-cn.com/problems/largest-color-value-in-a-directed-graph/)
+
 ##### 优先队列
 
 [5638. 吃苹果的最大数目](https://leetcode-cn.com/problems/maximum-number-of-eaten-apples/)
 
 ​	想用差分的思想做，过了 但是是错的。 只能优先队列。
 
-##### 单调栈
+##### 单调栈/栈
 
 [1776. 车队 II](https://leetcode-cn.com/problems/car-fleet-ii/)
 
 这个不会，当时做的时候懵逼，看了解答结果思路并不难
+
+[331. 验证二叉树的前序序列化](https://leetcode-cn.com/problems/verify-preorder-serialization-of-a-binary-tree/)
 
 ##### 贪心思想
 
@@ -436,6 +541,12 @@ dp, greedy都可
 [5563. 销售价值减少的颜色球](https://leetcode-cn.com/problems/sell-diminishing-valued-colored-balls/)
 
 第一反应是最大堆，贪心做，结果超时。没想到用二分。
+
+[5711. 有界数组中指定下标处的最大值](https://leetcode-cn.com/problems/maximum-value-at-a-given-index-in-a-bounded-array/)
+
+知道二分做。但是怎么二分的过程没有想清楚直接写，思路很混乱结果写了半个小时还没写出来。
+
+思路没有理清就别写。理清了在开始写代。
 
 [222. 完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes/)
 
@@ -624,8 +735,14 @@ class Solution {
   ```
 
   [5635. 构建字典序最大的可行序列](https://leetcode-cn.com/problems/construct-the-lexicographically-largest-valid-sequence/)
-
-
+  
+  [341. 扁平化嵌套列表迭代器](https://leetcode-cn.com/problems/flatten-nested-list-iterator/)
+  
+  ​	这种dfs平时见得少。
+  
+  [1473. 粉刷房子 III](https://leetcode-cn.com/problems/paint-house-iii/)
+  
+  ​	属于情况比较多但是耐心思考可以解出来的困难题目，不难写。
 
 ##### 滑动窗口
 
@@ -670,6 +787,14 @@ Prim && Kruskal
 prim 是一个动态的过程，每次先将最小到生成树距离的边加入最小生成树，然后更新其他点到树的最小距离，直到所有点都加入到树；
 
 Kruskal是每次都添加最小的边，通过并查集，将不同区域的边连在一起直到所有边都在一个集合中。
+
+##### 离线查询
+
+[5733. 最近的房间](https://leetcode-cn.com/problems/closest-room/)
+
+[1697. 检查边长度限制的路径是否存在](https://leetcode-cn.com/problems/checking-existence-of-edge-length-limited-paths/)
+
+[5748. 包含每个查询的最小区间](https://leetcode-cn.com/problems/minimum-interval-to-include-each-query/)
 
 ##### 排列组合
 
@@ -752,7 +877,7 @@ public long qPow(long x, long n){
 
 [1703. 得到连续 K 个 1 的最少相邻交换次数](https://leetcode-cn.com/problems/minimum-adjacent-swaps-for-k-consecutive-ones/)
 
-##### 找内在规律
+##### 找规律和模拟
 
 [5647. 解码异或后的排列](https://leetcode-cn.com/problems/decode-xored-permutation/)   
 
@@ -760,7 +885,15 @@ public long qPow(long x, long n){
 
 ​	这个完全可以转化为求子数组的最大和和最小和， 和53一样。
 
+[5716. 好因子的最大数目](https://leetcode-cn.com/problems/maximize-number-of-nice-divisors/)
 
+​	和lc343一模一样
+
+[1850. 邻位交换的最小次数](https://leetcode-cn.com/problems/minimum-adjacent-swaps-to-reach-the-kth-smallest-number/)
+
+​	就硬模拟。一个排列一个排列地模拟。
+
+[5757. 矩阵中最大的三个菱形和](https://leetcode-cn.com/problems/get-biggest-three-rhombus-sums-in-a-grid/)  暴力模拟即可
 
 ##### 一些小技巧
 
