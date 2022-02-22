@@ -43,8 +43,7 @@ consumer
 	为什么要多个分区呢?
  ![消费者群组](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/kafka-2.png)
 **leader & follower**
-leader读写，follower读数据。
+	leader读写，follower读数据。
 
 **HW & LEO**
-
- ![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/HWAndLEO.png)
+ 	![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/HWAndLEO.png)
