@@ -324,7 +324,8 @@ exatly once  ： two-phase commit
 当所有的分区上 in sync repicas 的commit 到log上时候，消息才认为是‘”commited“，消息只有 committed 消息才会给 consumer。
 只要有至少一个同步中的节点存活，提交的消息就不会丢失。  
 2.3.6 **可用性和持久性**  
-min.insync.replicas 
+min.insync.replicas  
+
 unclean.leader.election.enable  
 
 ### 3 Quick Start
@@ -335,3 +336,222 @@ bin zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties
 //start kafka
 kafka-server-start  /usr/local/etc/kafka/server.properties
 ```
+step2： 创建生产者发送消息，消费者接受消息
+```
+//生产者
+public class Producer implements Runnable {
+    private final KafkaProducer<String, String> producer;
+    private final String topic;
+
+
+    public Producer(String topicName) {
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        props.put("acks", "all");
+        //配置为大于0的值的话，客户端会在消息发送失败时重新发送。
+        props.put("retries", 3);
+        //当多条消息需要发送到同一个分区时，生产者会尝试合并网络请求。
+        props.put("batch.size", 16384);
+      	//增加了延迟，提高吞吐量
+        props.put("linger.ms",10000);
+        props.put("key.serializer", StringSerializer.class.getName());
+        props.put("value.serializer", StringSerializer.class.getName());
+       	//可以自定义分区策略
+        props.put("partitioner.class","com.kafka.demo.CustomerPartition");
+       this.producer = new KafkaProducer<String, String>(props);
+        this.topic = topicName;
+    }
+
+    public void run() {
+        int messageNo = 1;
+        try {
+            for(;;) {
+                String messageStr="你好，这是第"+messageNo+"条数据";
+                System.out.println(messageStr);
+                producer.send(new ProducerRecord<String, String>(topic, null, messageStr));
+                messageNo++;
+                Thread.sleep(1000);
+            }
+        } catch (Exception e) {
+        e.printStackTrace();
+        } finally {
+        producer.close();
+        }
+    }
+    }
+ //消费者   
+public class Consumer implements Runnable{
+    private final KafkaConsumer<String, String> consumer;
+    private ConsumerRecords<String, String> msgList;
+    private  String topic;
+    private static final String GROUPID = "groupA";
+
+    public Consumer(String topicName) {
+        Properties props = new Properties();
+        //kafka消费的的地址
+        props.put("bootstrap.servers", "localhost:9092");
+        //组名 不同组名可以重复消费
+        props.put("group.id", GROUPID);
+        //是否自动提交
+        props.put("enable.auto.commit", "true");
+        //从poll(拉)的回话处理时长
+        props.put("auto.commit.interval.ms", "1000");
+        //超时时间
+        props.put("session.timeout.ms", "30000");
+        //一次最多拉取的条数
+        props.put("max.poll.records", 1000);
+        props.put("zookeeper.connect", "localhost:2181");
+        props.put("auto.offset.reset", "earliest");
+        //序列化
+        props.put("key.deserializer", StringDeserializer.class.getName());
+        props.put("value.deserializer", StringDeserializer.class.getName());
+        this.consumer = new KafkaConsumer<String, String>(props);
+        this.topic = topicName;
+        //订阅主题列表topic
+        this.consumer.subscribe(Arrays.asList(topic));
+
+    }
+
+    public void run() {
+        int messageNo = 1;
+        System.out.println("---------开始消费---------");
+        try {
+            for (;;) {
+                msgList = consumer.poll(100);
+                if(null!=msgList&&msgList.count()>0){
+                    for (ConsumerRecord<String, String> record : msgList) {
+                        System.out.println(messageNo + "=======receive: key = " + record.key() + ", value = " + record.value()+
+                                " offset = "+record.offset());
+                        messageNo++;
+                    }
+                }else{
+                    Thread.sleep(1000);
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            consumer.close();
+        }
+    }
+}
+```
+topic相关的命令：
+```
+//topic 列表
+kafka-topics --bootstrap-server localhost:9092 --list
+//返回
+KAFKA_TEST
+__consumer_offsets
+
+//topic的详细信息
+kafka-topics --bootstrap-server localhost:9092 --describe __consumer_offsets
+//返回
+Topic: __consumer_offsets	TopicId: CSFLc27vQ0mdtft1eI48RQ	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,cleanup.policy=compact,segment.bytes=104857600
+```
+创建一个主体三分区，三副本
+```
+//server_1.properties
+listeners=PLAINTEXT://localhost:9093
+broker.id = 1
+log.dir=/tmp/kafka-logs-1
+//server_2.properties
+listeners=PLAINTEXT://localhost:9094
+broker.id = 2
+log.dir=/tmp/kafka-logs-2
+
+//创建topicTest  3分区三副本
+kafka kafka-topics --bootstrap-server localhost:9092 --create --topic topicTest --replication-factor 3 --partitions 3
+
+//获取主题相关信息
+Topic: topicTest	TopicId: gdCSKlkqTXqmAFZnByYHeQ	PartitionCount: 3	ReplicationFactor: 3	Configs: segment.bytes=1073741824
+	Topic: topicTest	Partition: 0	Leader: 0	Replicas: 0,1,2	Isr: 0,1,2
+	Topic: topicTest	Partition: 1	Leader: 2	Replicas: 2,0,1	Isr: 2,0,1
+	Topic: topicTest	Partition: 2	Leader: 1	Replicas: 1,2,0	Isr: 1,2,0
+```
+消费组相关
+```
+// 查看消费者的情况
+kafka-consumer-groups --bootstrap-server localhost:9092 --group groupA --describe
+```
+ ![消费者脚本输出](httpsgithub.com/xiechengsiii/Java_Notes/blob/master/pics/consumerPrint.png)  
+current-offset  当前提交量，表示下次拉取消息时，是从这个位置开始拉取。比如图中对于partion-1，下次拉取offset =  60  的消息  
+log-end-offset  下一条将要被加入的到日志的消息的偏移量  
+
+几个场景case：
+
+1. 最少同步副本数不满足 min.insync.replica
+```
+//改变配置 最小同步副本数=3
+bin kafka-configs --bootstrap-server localhost:9092 --alter --entity-type topics --entity-name topicTest --add-config min.insync.replicas=3
+```
+如果停掉一个broker， producer就会报错：
+[kafka-producer-network-thread | producer-1] WARN org.apache.kafka.clients.producer.internals.Sender - [Producer clientId=producer-1] Got error produce response with correlation id 30 on topic-partition topicTest-0, retrying (1 attempts left). Error: NOT_ENOUGH_REPLICAS
+  修改min.insync.replicas 或者等待broker正常即可  
+2.发送消息顺序和消费顺序不一致  
+```
+  //producer   
+   props.put("retries", 3);
+   props.put("retry.backoff.ms", 3000);
+   
+   for(;;) {
+                String messageStr="你好，这是第"+messageNo+"条数据";
+                System.out.println(messageStr);
+                producer.send(new ProducerRecord<String, String>(topic, null, messageStr));
+                messageNo++;
+                Thread.sleep(3000);
+         }
+```
+min.insync.replicas=3的情况下，  此时如果一个broker挂掉，生产者会进行重试。
+重试过程中broker恢复，消费者可能会收到和发送顺序不一致的消息  
+ ![顺序不一致](httpsgithub.com/xiechengsiii/Java_Notes/blob/master/pics/消息顺序不一致.png)  
+
+解决
+```
+ props.put("max.in.flight.requests.per.connection", 1);
+ ```
+ 
+### 4 压力测试 
+#### 4.1 测试条件
+	单机单partion
+机器：MacOS, 2.6 GHz 6-Core Intel Core i7,  RAM 16 GB， 500G SSD
+测试工具 ： kafka自带压测脚本
+kafka ： kafka-3.00
+#### 4.2 测试命令
+```
+kafka-producer-perf-test --topic test_perf --num-records 1000000 --record-size 320 --throughput 8000  --producer-props bootstrap.servers=127.0.0.1:9092
+```
+4.3 测试结果
+producer  
+throughput	record-size/B	num-records/W	实际写入消息数/s	avg latency/ms	95%的消息延迟/ms	max latency/ms
+100	10	1	99.99	0.88	1	229.00
+100	80	1	99.99	0.87	1	259.00
+100	160	1	99.99	0.88	1	240.00
+1000	160	10	999.93	0.53	1	268.00
+2000	160	10	1999.64	0.53	1	272.00
+4000	160	10	3998.72	 0.74	1	222.00
+8000	160	10	7994.24	0.65	1	227.00
+8000	160	100	7999.42	0.62	1	225.00
+8000	320	100	7999.48	0.64	1	222.00
+
+ 固定 throughput = 1W， num-records = 320B，num-records  = 100W  
+ batchSize/B	lingger.ms	records/s	avg latency/ms
+100	0	9999.2	13.92
+1000	0	9999.3	1.71
+10000	0	9999.2	0.61
+10000	10	9999.0	1.86throughput = -1  num-records = 320B，num-records  = 1WbatchSize/B	lingger.ms	records/s	avg latency/ms
+10000	10	27855	21.37
+10000	30	29498	16.21
+10000	50	30959	14.15 
+固定参数 num-records=100W  --record-size =320   batch.size=10000  
+throughput	records（MB/s）	avg latency/ms
+100000	30.49	4.0
+200000	60.99	3.9
+300000	75.07	4.11
+400000	74.78	3.80
+500000	76.01	3.45
+
+
+### 5 参考资料
+1. https://kafka.apache.org/documentation
+2.《kafka权威指南》
