@@ -301,19 +301,19 @@ tips： 如何选定分区数量？可以从以下几个因素考虑
 日志片段大小达到 log.segment.bytes 指定的上限（默认是 1GB）时，当前日志片段就会被关闭，一个新的日志片段被打开
    
    5.log.segment.ms  
-​ 	指定了多长时间之后日志片段会被关闭
+   指定了多长时间之后日志片段会被关闭
  
   6.message.max.bytes  
 单个消息的最大大小，默认值是 1000000，即1MB。如果生产者尝试发送的消息超过这个大小，不仅消息不会被接收，会收到broker返回的错误信息
 tips1：这个值对性能有显著的影响。值越大，那么负责处理网络连接和请求的线程就需要花越多的时间来处理这些请求。它还会增加磁盘写入块的大小，从而影响 IO 吞吐量
-tips2：消费者客户端设置的 fetch.message.max.bytes 必须与服务器端设置的消息大小进行协调 。如果这个值比 message.max.bytes 小，那么消费者就无法读取比较大的消息，导致出现消费者被阻塞的情况。  
+tips2：消费者客户端设置的 fetch.message.max.bytes 必须与服务器端设置的消息大小进行协调 。如果这个值比 message.max.bytes 小，那么消费者就无法读取比较大的消息，导致出现消费者被阻塞的情况。    
 2.3.4 **消息传递语义**  
-	at most once   消息可能丢失但绝不重传
-	at least once	  消息可以重传但绝不丢失
-	exatly once  每个消息只传递一次
+	at most once   消息可能丢失但绝不重传  
+	at least once	  消息可以重传但绝不丢失  
+	exatly once  每个消息只传递一次  
 producer：
 
-consumer：
+consumer：  
   	![消息语义](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/消息语义.png)  
 
 exatly once  ： two-phase commit  
@@ -325,5 +325,5 @@ exatly once  ： two-phase commit
 只要有至少一个同步中的节点存活，提交的消息就不会丢失。  
 2.3.6 **可用性和持久性**  
 min.insync.replicas 
-unclean.leader.election.enable
+unclean.leader.election.enable  
 
