@@ -555,5 +555,5 @@ throughput	records（MB/s）	avg latency/ms
 
 
 ### 5 参考资料
-1. https://kafka.apache.org/documentation  
-2.《kafka权威指南》
+1 https://kafka.apache.org/documentation   
+2 《kafka权威指南》
