@@ -73,3 +73,14 @@ push vs pull?
 5. value.serializer
 6. value的序列化器
 创建一个新的生产者的简单示例，只指定了必要的属性，其他使用默认设置 ：
+```Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        //acks = 0, 1, all
+        props.put("acks", "0");
+        //配置为大于0的值的话，客户端会在消息发送失败时重新发送。
+        props.put("retries", 0);
+        //当多条消息需要发送到同一个分区时，生产者会尝试合并网络请求。
+        props.put("batch.size", 16384);
+        props.put("key.serializer", StringSerializer.class.getName());
+        props.put("value.serializer", StringSerializer.class.getName());
+        this.producer = new KafkaProducer<String, String>(props);```
