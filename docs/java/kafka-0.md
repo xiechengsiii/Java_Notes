@@ -141,7 +141,8 @@ props.put("value.deserializer","org.apache.kafka.common.serialization.StringDese
 KafkaConsumer<String, String> consumer = new KafkaConsumer<String,String>(props)
 ```
 **订阅主题**   
-``` consumer.subscribe(Collections.singletonList("testTopic")); 
+```
+consumer.subscribe(Collections.singletonList("testTopic")); 
 ```
 **轮询**  
 poll方法是消费者 API 的核心，通过一个简单的轮询向服务器请求数据。一旦消费者订阅了主题，轮询就会处理所有的细节，包括群组协调、分区再均衡、发送心跳和获取数据。
@@ -216,9 +217,107 @@ while (true) {
 ```
 在成功提交或碰到无法恢复的错误之前， commitSync() 会一直重试，但是 commitAsync() 不会。它之所以不进行重试，是因为在它收到服务器响应的时候，可能有一个更大的偏移量已经提交成功。
 #### 2.3 一些说明
-2.3.1 生产者配置
+2.3.1 **生产者配置**  
 1. acks
 指定了必须要有多少个分区副本收到消息，生产者才会认为消息写入是成功的。这个参数对消息丢失的可能性有重要影响。
 ​ 	acks = 0 生产者在成功写入消息之前不会等待任何来自服务器的响应。生产者不知道消息是否丢失，不过，因为生产者不需要等待服务器的响应，所以它可以以网络能够支持的最大速度发送消息，从而达到很高的吞吐量。
 ​ 	acks = 1 只要集群的首领节点收到消息，生产者就会收到一个来自服务器的成功响应。如果消息无法到达首领节点（比如首领节点崩溃，新的首领还没有被选举出来），生产者会收到一个错误响应，为了避免数据丢失，生产者会重发消息。
 ​	acks = all（-1） 只有当所有参与复制的节点全部收到消息时，生产者才会收到一个来自服务器的成功响应。这种模式是最安全的，它可以保证不止一个服务器收到消息，就算有服务器发生崩溃，整个集群仍然可以运行。不过，它的延迟比 acks=1 时更高，因为需要等待不只一个服务器节点接收消息。
+ 	![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/acks.png)  
+	2. buffer.memory
+该参数用来设置生产者内存缓冲区的大小，生产者用它缓冲要发送到服务器的消息。如果应用程序发送消息的速度超过发送到服务器的速度，会导致生产者空间不足。这个时候，send() 方法调用要么被阻塞，要么抛出异常，取决于如何设置 max.block.ms参数，表示在抛出异常之前可以阻塞多长时间。
+
+3. compression.type
+默认情况下，消息发送时不会被压缩。该参数可以设置为 snappy、 gzip 或 lz4，它指定了消息被发送broker 之前使用哪一种压缩算法进行压缩 。snappy 算法占用较少的 CPU，能提供较好的性能和相当可观的压缩比，如果比较关注性能和网络带宽，可以使用这种算法。 gzip 压缩算法一般会占用较多的 CPU，但会提供更高的压缩比，所以如果网络带宽比较有限，可以使用这种算法。使用压缩可以降低网络传输开销和存储开销，而这往往是向 Kafka 发送消息的瓶颈所在。
+
+4. retries
+生产者可以重发消息的次数，如果达到这个次数，生产者会放弃重试并返回错误。默认情况下，生产者会在每次重试之间等待 100ms。
+
+5. batch.size
+当有多个消息需要被发送到同一个分区时，生产者会把它们放在同一个批次里。
+6. linger.ms
+该参数指定了生产者在发送批次之前等待更多消息加入批次的时间。 KafkaProducer 会在批次填满或 linger.ms 达到上限时把批次发送出去。默认情况下，只要有可用的线程，生产者就会把消息发送出去，就算批次里只有一个消息。把 linger.ms 设置成比 0 大的数，让生产者在发送批次之前等待一会儿，使更多的消息加入到这个批次。虽然这样会增加延迟，但也会提升吞吐量。
+
+7. max.in.flight.requests.per.connection
+指定了生产者在收到服务器响应之前可以发送多少个消息。它的值越高，就会占用越多的内存，不过也会提升吞吐量。把它设为 1 可以保证消息是按照发送的顺序写入服务器的，即使发生了重试。
+
+8. timeout.ms、 request.timeout.ms 和 metadata.fetch.timeout.ms
+request.timeout.ms 指定了生产者在发送数据时等待服务器返回响应的时间， metadata.fetch.timeout.ms 指定了生产者在获取元数据（比如目标分区的首领是谁）时等待服务器返回响应的时间。如果等待响应超时，那么生产者要么重试发送数据，要么返回一个错误（抛出异常或执行回调）。 timeout.ms 指定了 broker 等待同步副本返回消息确认的时间。
+
+9. max.request.size
+用于控制生产者发送的请求大小。它可以指能发送的单个消息的最大值，也可以指单个请求里所有消息总的大小。例如，假设这个值为 1MB， 那么可以发送的单个最大消息为 1MB，或者生产者可以在单个请求里发送一个批次，该批次包含了 1000 个消息，每个消息大小为 1KB。另外， broker 对可接收的消息最大值也有自己的限制（message.max.bytes），所以两边的配置最好可以匹配，避免生产者发送的消息被 broker 拒绝。
+
+10. receive.buffer.bytes 和 send.buffer.bytes
+分别指定了 TCP socket 接收和发送数据包的缓冲区大小。如果它们被设为 -1，就使用操作系统的默认值。
+tips：Kafka 可以保证同一个分区里的消息是有序的。 如果把 retries 设为非零整数，同时把 max.in.flight.requests.per.connection 设为比 1 大的数，那么，如果第一个批次消息写入失败，而第二个批次写入成功， broker 会重试写入第一个批次。如果此时第一个批次也写入成功，那么两个批次的顺序就反过来了。一般来说，如果消息对顺序敏感，可以把 max.in.flight.requests.per.connection 设为 1，这样在生产者尝试发送第一批消息时，就不会有其他的消息发送给 broker。不过这样会降低生产者的吞吐量，
+2.3.2 **消费者配置**  
+1. fetch.min.bytes
+消费者从服务器获取记录的最小字节数。 broker 在收到消费者的数据请求时，如果可用的数据量小于 fetch.min.bytes 指定的大小，那么它会等到有足够的可用数据时才把它返回给消费者。这样可以降低消费者和 broker 的工作负载，因为它们在主题不是很活跃的时候（或者一天里的低谷时段）就不需要来来回回地处理消息。
+
+2. fetch.max.wait.ms
+用于指定 broker 的等待时间，默认是 500ms。 如果 fetch.max.wait.ms 被设为 100ms，并fetch.min.bytes 被设为 1MB，那么 Kafka 在收到消费者的请求后，要么返回 1MB 数据，要么在 100ms 后返回所有可用的数据，就看哪个条件先得到满足。
+
+3. max.partition.fetch.bytes
+指定了服务器从每个分区里返回给消费者的最大字节数。它的默认值是 1MB，。如果一个主 题有 20 个分区和 5 个消费者，那么每个消费者需要至少 4MB 的可用内存来接收记录。在为消费者分配内存时，可以给它们多分配一些，因为如果群组里有消费者发生崩溃，剩下的消费者需要处理更多的分区。 max.partition. fetch.bytes 的值必须比 broker 能够接收的最大消息的字节数（通过 max.message.size 属性配置）大，否则消费者可能无法读取这些消息，导致消费者一直挂起重试 。
+
+4. session.timeout.ms
+指定了消费者在被认为死亡之前可以与服务器断开连接的时间，默认是 3s。如果消费者没有在 session.timeout.ms 指定的时间内发送心跳给群组协调器，就被认为已经死亡，协调器就会触发再均衡，把它的分区分配给群组里的其他消费者。
+
+5. auto.offset.reset
+指定了消费者在读取一个没有偏移量的分区或者偏移量无效的情况下，该作何处理。默认值是 latest.
+tips ：分区没有提交偏移量时才生效
+ 	![offsetReset.png](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/offsetReset.png)  
+6. enable.auto.commit
+该属性指定了消费者是否自动提交偏移量，默认值是 true。为了尽量避免出现重复数据和数据丢失 一般设为 false，由自己控制何时提交偏移量
+如果设置手动提交，但是没有提交，会从最近的一次提交的offerset拉取数据
+
+
+7. partition.assignment.stratege
+Range---把主题的若干个连续的分区分配给消费者。
+RoundRobin---把主题的所有分区逐个分配给消费者。
+
+8. max.poll.records
+单次调用 poll() 方法能够返回的记录数量，用于控制在轮询里需要处理的数据量
+
+9. receive.buffer.bytes 和 send.buffer.bytes
+socket 在读写数据时用到的 TCP 缓冲区也可以设置大小。如果它们被设为 -1，就使用操 作系统的默认值。
+
+2.3.3  主题相关配置
+1. num.partitions
+指定新创建的主题将包含多少个分区 。
+tips： 如何选定分区数量？可以从以下几个因素考虑
+● 主题需要达到多大的吞吐量？
+● 从单个分区读取数据的最大吞吐量是多少？每个分区一般都会有一个消费者，如果消费者将数据写入数据库的速度不会超过每秒 50MB，那么从个分区读取数据的吞吐量不需要超过每秒 50MB。
+● 可以通过类似的方法估算生产者向单个分区写入数据的吞吐量，不过生产者的速度一般比消费者快得多，最好为生产者多估算一些吞吐量。
+● 每个 broker 包含的分区个数、可用的磁盘空间和网络带宽。
+● 单个 broker 对分区个数是有限制的，因为分区越多，占用的内存越多，完成首领选举需要的时间也越长。
+
+    2.log.retention.ms 
+决定数据可以被保留多久，默认值为 168 小时
+
+    3. log.retention.bytes 
+通过保留的消息字节数来判断消息是否过期 .比如有一个包含 8 个分区的主题，并且 log.retention.bytes 设为 1GB，那么这个主题最多可以保留 8GB 的数据。
+    
+   4.log.segment.bytes
+日志片段大小达到 log.segment.bytes 指定的上限（默认是 1GB）时，当前日志片段就会被关闭，一个新的日志片段被打开
+   
+   5.log.segment.ms
+​ 	指定了多长时间之后日志片段会被关闭
+ 
+  6.message.max.bytes
+单个消息的最大大小，默认值是 1000000，即1MB。如果生产者尝试发送的消息超过这个大小，不仅消息不会被接收，会收到broker返回的错误信息
+tips1：这个值对性能有显著的影响。值越大，那么负责处理网络连接和请求的线程就需要花越多的时间来处理这些请求。它还会增加磁盘写入块的大小，从而影响 IO 吞吐量
+tips2：消费者客户端设置的 fetch.message.max.bytes 必须与服务器端设置的消息大小进行协调 。如果这个值比 message.max.bytes 小，那么消费者就无法读取比较大的消息，导致出现消费者被阻塞的情况。
+
+
+2.3.4 消息传递语义
+	at most once   消息可能丢失但绝不重传
+	at least once	  消息可以重传但绝不丢失
+	exatly once  每个消息只传递一次
+producer：
+
+consumer：
+  	![消息语义](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/消息语义.png)  
+
+exatly once  ： two-phase commit
+
