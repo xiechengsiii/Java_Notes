@@ -513,15 +513,16 @@ min.insync.replicas=3的情况下，  此时如果一个broker挂掉，生产者
  
 ### 4 压力测试 
 #### 4.1 测试条件
-	单机单partion
+单机单partion  
 机器：MacOS, 2.6 GHz 6-Core Intel Core i7,  RAM 16 GB， 500G SSD
 测试工具 ： kafka自带压测脚本
-kafka ： kafka-3.00
-#### 4.2 测试命令
+kafka ： kafka-3.00  
+
+#### 4.2 测试命令  
 ```
 kafka-producer-perf-test --topic test_perf --num-records 1000000 --record-size 320 --throughput 8000  --producer-props bootstrap.servers=127.0.0.1:9092
 ```
-4.3 测试结果
+#### 4.3 测试结果
 producer  
 throughput	record-size/B	num-records/W	实际写入消息数/s	avg latency/ms	95%的消息延迟/ms	max latency/ms
 100	10	1	99.99	0.88	1	229.00
@@ -553,5 +554,5 @@ throughput	records（MB/s）	avg latency/ms
 
 
 ### 5 参考资料
-1. https://kafka.apache.org/documentation
+1. https://kafka.apache.org/documentation  
 2.《kafka权威指南》
