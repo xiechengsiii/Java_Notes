@@ -62,10 +62,10 @@ push vs pull?
 参考[push vs pull](http://kafkadoc.beanmr.com/040_design/01_design_cn.html#theconsumer)	
 ### 2 kafka生产者和消费者
 #### 2.1 生产者
-2.1.1 **生产者发送消息的主要步骤**
+2.1.1 **生产者发送消息的主要步骤**  
  ![消费者群组](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/produceStep.png)  
-2.1.2 **创建生产者**
-必选属性
+2.1.2 **创建生产者**  
+必选属性  
 1. bootstrap.servers
 2. broker地址
 3. key.serializer
@@ -84,10 +84,11 @@ push vs pull?
         props.put("key.serializer", StringSerializer.class.getName());
         props.put("value.serializer", StringSerializer.class.getName());
         this.producer = new KafkaProducer<String, String>(props); ```  
-2.1.3 **消息发送**
-1. 同步发送
+  
+2.1.3  **消息发送**  
+1. 同步发送  
 使用 send() 方法发送消息，它会返回一个 Future 对象，调用 get() 方法进行等待，就可以知道消息是否发送成功。
-2. 异步发送
+2. 异步发送  
 通过 Callback 模式异步获取消息发送的响应结果，即不管消息发送成功还是失败，都会以回调的方式通知客户端，客户端期间不需要阻塞等待。
 ```private class DemoProducerCallback implements Callback {
    @Override
