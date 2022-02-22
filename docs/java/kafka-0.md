@@ -104,6 +104,121 @@ push vs pull?
 ```  
 tips: 上述例子都使是单线程，但其实生产者是可以使用多线程来发送消息的。如果需要更高的吞吐量，可以在生产者数量不变的前提下增加线程数量。如果这样做还不够，可以增加生产者数量 。
 
-2.1.4 **分区**
+2.1.4 **分区**  
+
 如果键值为 null，并且使用了默认的分区器，那么消息将被随机地发送到主题内各个可用的分区上。分区器使用轮询（Round Robin）将消息均衡地分布到各个分区上。如果键不为空，并且使用了默认的分区器，那么 Kafka 会对键进行散列 ，散列值把消息映射到特定的分区上
 同样也可以自定义分区策略,需要实现Partitioner 接口：
+```public class CustomerPartition implements Partitioner {
+    @Override
+    public void close() {
+
+    }
+    @Override
+    public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
+        if ("testKey".equals(key)) {
+            return 0;
+        }
+        List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
+        int partitionsSize = partitions.size();
+        return Utils.toPositive(Utils.murmur2(keyBytes)) % partitionsSize;
+
+    }
+
+    @Override
+    public void configure(Map<String, ?> map) {
+
+    }
+}
+```
+#### 2.2 消费者
+2.2.1 创建消费者
+与生产者一样，有三个必要属性：bootstrap.servers、 key.deserializer 和 value.deserializer。 
+``` Properties props = new Properties();
+props.put("bootstrap.servers", "localhost:9092");
+props.put("group.id", "CountryCounter");
+props.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+props.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+KafkaConsumer<String, String> consumer = new KafkaConsumer<String,String>(props)
+```
+**订阅主题**   
+``` consumer.subscribe(Collections.singletonList("testTopic")); 
+```
+**轮询**  
+poll方法是消费者 API 的核心，通过一个简单的轮询向服务器请求数据。一旦消费者订阅了主题，轮询就会处理所有的细节，包括群组协调、分区再均衡、发送心跳和获取数据。
+```
+try {
+    while (true) { 
+        ConsumerRecords<String, String> records = consumer.poll(100); 
+        for (ConsumerRecord<String, String> record : records) {
+            int updatedCount = 1;
+            if (custCountryMap.countainsValue(record.value())) {
+                updatedCount = custCountryMap.get(record.value()) + 1;
+            }
+            custCountryMap.put(record.value(), updatedCount)
+            JSONObject json = new JSONObject(custCountryMap);
+            System.out.println(json.toString(4)) 
+            }
+        }
+    } finally {
+    consumer.close();
+}
+```
+2.2.2 提交和偏移量
+​	提交就是更新分区当前消息位置的操作。offest 可以自己控制
+1. 自动提交
+​	如果 enable.auto.commit 被设为 true，那么每过 auto.commit.interval.ms，消费者会自动把从 poll() 方法接收到的最大偏移量提交上去。
+​ 
+2 手动提交（推荐）
+​	把 auto.commit.offset 设为 false, 由自己控制控制偏移量提交时间来消除丢失消息的可能性，并在发生再均衡时减少重复消息的数量 。
+```
+//同步提交
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(100);
+    for (ConsumerRecord<String, String> record : records){
+        System.out.printf("topic = %s, partition = %s, offset =
+        %d, customer = %s, country = %s\n",
+        record.topic(), record.partition(),
+        record.offset(), record.key(), record.value()); 
+    }
+    try {
+        consumer.commitSync(); 
+    } catch (CommitFailedException e) {
+    log.error("commit failed", e) 
+    }
+}
+
+//异步提交
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(100);
+    for (ConsumerRecord<String, String> record : records){
+        System.out.printf("topic = %s, partition = %s,
+        offset = %d, customer = %s, country = %s\n",
+        record.topic(), record.partition(), record.offset(),
+        record.key(), record.value());
+    }
+    consumer.commitAsync(); 
+}
+// 异步提交同样支持回调
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(100);
+    for (ConsumerRecord<String, String> record : records) {
+        System.out.printf("topic = %s, partition = %s,
+        offset = %d, customer = %s, country = %s\n",
+        record.topic(), record.partition(), record.offset(),
+        record.key(), record.value());
+    }
+    consumer.commitAsync(new OffsetCommitCallback() {
+    public void onComplete(Map<TopicPartition, OffsetAndMetadata> offsets, Exception e) {
+        if (e != null) log.error("Commit failed for offsets {}", offsets, e);
+        }
+    }); 
+}
+```
+在成功提交或碰到无法恢复的错误之前， commitSync() 会一直重试，但是 commitAsync() 不会。它之所以不进行重试，是因为在它收到服务器响应的时候，可能有一个更大的偏移量已经提交成功。
+#### 2.3 一些说明
+2.3.1 生产者配置
+1. acks
+指定了必须要有多少个分区副本收到消息，生产者才会认为消息写入是成功的。这个参数对消息丢失的可能性有重要影响。
+​ 	acks = 0 生产者在成功写入消息之前不会等待任何来自服务器的响应。生产者不知道消息是否丢失，不过，因为生产者不需要等待服务器的响应，所以它可以以网络能够支持的最大速度发送消息，从而达到很高的吞吐量。
+​ 	acks = 1 只要集群的首领节点收到消息，生产者就会收到一个来自服务器的成功响应。如果消息无法到达首领节点（比如首领节点崩溃，新的首领还没有被选举出来），生产者会收到一个错误响应，为了避免数据丢失，生产者会重发消息。
+​	acks = all（-1） 只有当所有参与复制的节点全部收到消息时，生产者才会收到一个来自服务器的成功响应。这种模式是最安全的，它可以保证不止一个服务器收到消息，就算有服务器发生崩溃，整个集群仍然可以运行。不过，它的延迟比 acks=1 时更高，因为需要等待不只一个服务器节点接收消息。
