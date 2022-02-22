@@ -62,9 +62,9 @@ push vs pull?
 参考[push vs pull](http://kafkadoc.beanmr.com/040_design/01_design_cn.html#theconsumer)	
 ### 2 kafka生产者和消费者
 #### 2.1 生产者
-2.1.1 生产者发送消息的主要步骤
+2.1.1 **生产者发送消息的主要步骤**
  ![消费者群组](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/produceStep.png)  
-2.1.2 创建生产者
+2.1.2 **创建生产者**
 必选属性
 1. bootstrap.servers
 2. broker地址
@@ -83,8 +83,8 @@ push vs pull?
         props.put("batch.size", 16384);
         props.put("key.serializer", StringSerializer.class.getName());
         props.put("value.serializer", StringSerializer.class.getName());
-        this.producer = new KafkaProducer<String, String>(props);```
-2.1.3 消息发送
+        this.producer = new KafkaProducer<String, String>(props); ```  
+2.1.3 **消息发送**
 1. 同步发送
 使用 send() 方法发送消息，它会返回一个 Future 对象，调用 get() 方法进行等待，就可以知道消息是否发送成功。
 2. 异步发送
@@ -103,3 +103,6 @@ push vs pull?
 ```  
 tips: 上述例子都使是单线程，但其实生产者是可以使用多线程来发送消息的。如果需要更高的吞吐量，可以在生产者数量不变的前提下增加线程数量。如果这样做还不够，可以增加生产者数量 。
 
+2.1.4 **分区**
+如果键值为 null，并且使用了默认的分区器，那么消息将被随机地发送到主题内各个可用的分区上。分区器使用轮询（Round Robin）将消息均衡地分布到各个分区上。如果键不为空，并且使用了默认的分区器，那么 Kafka 会对键进行散列 ，散列值把消息映射到特定的分区上
+同样也可以自定义分区策略,需要实现Partitioner 接口：
