@@ -73,7 +73,7 @@ push vs pull?
 5. value.serializer
 6. value的序列化器
 创建一个新的生产者的简单示例，只指定了必要的属性，其他使用默认设置 ：
-```Properties props = new Properties();
+``` Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
         //acks = 0, 1, all
         props.put("acks", "0");
@@ -83,8 +83,8 @@ push vs pull?
         props.put("batch.size", 16384);
         props.put("key.serializer", StringSerializer.class.getName());
         props.put("value.serializer", StringSerializer.class.getName());
-        this.producer = new KafkaProducer<String, String>(props); ```  
-  
+        this.producer = new KafkaProducer<String, String>(props);
+ ``` 
 2.1.3  **消息发送**  
 1. 同步发送  
 使用 send() 方法发送消息，它会返回一个 Future 对象，调用 get() 方法进行等待，就可以知道消息是否发送成功。
