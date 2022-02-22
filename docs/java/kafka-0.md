@@ -31,19 +31,19 @@ kafka为数据生态系统带来了循环系统。它在基础设施的各个组
 **broker**  
 	一个独立的kafka服务器就是broker。broker接受来自生产者的消息，为消息设置偏移量，提交消息到磁盘，为消费者读取分区的请求作出响应，返回已经提交到磁盘上的消息。kafka集群有由一个或多个broker组成  
 **producer**  
-	创建消息并推到broker  
-consumer  
+	创建消息并推到broker <br> 
+**consumer**  
 	从broker拉取消息，多个消费者组成消费者群组，在一个群组的消费者共同读取一个主体  
 **topic**  
-	kafka消息通过主题进行分类  
+	kafka消息通过主题进行分类 <br>  
 **offset**  
-	partion中消息的唯一标识。对于同一个partition，一个不断递增的整数值。在创建消息时，kafka会将其添加到消息中。在给定的分区中，每个消息的偏移量都是唯一的。  
+	partion中消息的唯一标识。对于同一个partition，一个不断递增的整数值。在创建消息时，kafka会将其添加到消息中。在给定的分区中，每个消息的偏移量都是唯一的。  <br> 
 **partition**  
 	一个主题上的消息，可以存储在不同分区上。	
-	为什么要多个分区呢?  
+	为什么要多个分区呢?  <br> 
  ![消费者群组](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/kafka-2.png)
 **leader & follower**  
 	leader读写，follower读数据。  
 
 **HW & LEO**  
- 	![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/HWAndLEO.png)
+ 	![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/HWAndLEO.png)<br> 
