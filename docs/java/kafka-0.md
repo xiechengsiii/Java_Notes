@@ -59,4 +59,17 @@ kafka为数据生态系统带来了循环系统。它在基础设施的各个组
 	 kafka体系架构包括若干Producer、Broker、Consumer和一个zookeeper集群。
  	![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/architecture.png)  
 push vs pull?  
-[push vs pull](http://kafkadoc.beanmr.com/040_design/01_design_cn.html#theconsumer)	
+参考[push vs pull](http://kafkadoc.beanmr.com/040_design/01_design_cn.html#theconsumer)	
+### 2 kafka生产者和消费者
+#### 2.1 生产者
+2.1.1 生产者发送消息的主要步骤
+ ![消费者群组](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/produceStep.png)  
+2.1.2 创建生产者
+必选属性
+1. bootstrap.servers
+2. broker地址
+3. key.serializer
+4. key的序列化器
+5. value.serializer
+6. value的序列化器
+创建一个新的生产者的简单示例，只指定了必要的属性，其他使用默认设置 ：
