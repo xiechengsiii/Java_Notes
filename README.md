@@ -1,7 +1,6 @@
 JAVA学习笔记， 主要包括jvm, Mysql, Java相关,分布式，应用框架，计算机基础等;  
 主要是为了记录自己的学习过程
 
-- [ ] 完成进度 ---- 10%
 ### Java相关
 #### [javaBase](/docs/java/javaBase.md)
 #### [MySQL](/docs/java/MySQL.md)
