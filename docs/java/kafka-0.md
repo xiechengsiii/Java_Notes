@@ -327,3 +327,11 @@ exatly once  ： two-phase commit
 min.insync.replicas 
 unclean.leader.election.enable  
 
+### 3 Quick Start
+step1 ： 启动zookeeper和kafka服务
+```
+// 命令行 start zk
+bin zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties
+//start kafka
+kafka-server-start  /usr/local/etc/kafka/server.properties
+```
