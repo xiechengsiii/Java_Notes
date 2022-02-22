@@ -57,7 +57,7 @@ kafka为数据生态系统带来了循环系统。它在基础设施的各个组
 
 **逻辑架构**  
 	 kafka体系架构包括若干Producer、Broker、Consumer和一个zookeeper集群。
- 	![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/rchitecture.png)  
+ 	![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/architecture.png)  
 
 	push vs pull?
 	[push vs pull](http://kafkadoc.beanmr.com/040_design/01_design_cn.html#theconsumer)	
