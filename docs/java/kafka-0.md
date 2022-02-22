@@ -84,3 +84,22 @@ push vs pull?
         props.put("key.serializer", StringSerializer.class.getName());
         props.put("value.serializer", StringSerializer.class.getName());
         this.producer = new KafkaProducer<String, String>(props);```
+2.1.3 消息发送
+1. 同步发送
+使用 send() 方法发送消息，它会返回一个 Future 对象，调用 get() 方法进行等待，就可以知道消息是否发送成功。
+2. 异步发送
+通过 Callback 模式异步获取消息发送的响应结果，即不管消息发送成功还是失败，都会以回调的方式通知客户端，客户端期间不需要阻塞等待。
+```private class DemoProducerCallback implements Callback {
+   @Override
+   public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+       if (e != null) {
+           e.printStackTrace(); 
+           }
+       }
+   }
+   ProducerRecord<String, String> record =
+   new ProducerRecord<>("testTopic", "Products2", "USA"); 
+   producer.send(record, new DemoProducerCallback());
+```  
+tips: 上述例子都使是单线程，但其实生产者是可以使用多线程来发送消息的。如果需要更高的吞吐量，可以在生产者数量不变的前提下增加线程数量。如果这样做还不够，可以增加生产者数量 。
+
