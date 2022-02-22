@@ -282,7 +282,7 @@ RoundRobin---把主题的所有分区逐个分配给消费者。
 9. receive.buffer.bytes 和 send.buffer.bytes  
 socket 在读写数据时用到的 TCP 缓冲区也可以设置大小。如果它们被设为 -1，就使用操 作系统的默认值。  
 
-2.3.3  主题相关配置 
+2.3.3  **主题相关配置 **  
 1. num.partitions  
 指定新创建的主题将包含多少个分区 。
 tips： 如何选定分区数量？可以从以下几个因素考虑  
