@@ -4,9 +4,9 @@
 ​	Kafka 是为了解决 LinkedIn 数据管道问题应运而生的。它的设计目的是提供一个高性能的消息系统，可以处理多种数据类型，并能够实时提供结构化的用户活动数据和系统度量指标。kafka于2010年12月份开源，成Apache的顶级子项目。
 
 ![项目结构演变](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/kaka-0.png)
- 
-​ 
-​ 	不同系统之间复杂的数据同步是一中挑战。kafka就是为了解决上述问题而设计的一款基于发布与订阅的消息系统。Kafka可以让合适的数据以合适的形式出现在合适的地方。
+
+
+ 	不同系统之间复杂的数据同步是一中挑战。kafka就是为了解决上述问题而设计的一款基于发布与订阅的消息系统。Kafka可以让合适的数据以合适的形式出现在合适的地方。
 #### 1.2 kafka优势
 1. 无缝支持多个生产者与消费 Kafka 可以无缝地支持多个生产者，不管客户端在使用单个主题还是多个主题。所以它很适合用来从多个前端系统收集数据，并以统一的格式对外提供数据。例如，一个包含了多个微服务的网站，可以为页面视图创建一个单独的主题，所有服务都以相同的消息格式向该主题写入数据。消费者应用程序会获得统一的页面视图，而无需协调来自不同生产者的数据流。
 
@@ -23,7 +23,7 @@
 5. 流处理
 	具体来说，一些对实时性要求不高的写操作，不需要立刻将结果反馈给用户，都可以采用kafka来解耦服务和存储过程。
 #### 1.4 数据生态系统
-​ 大量的工具都能集成了kafka。Ecosystem 中列出了许多工具，包括流处理系统、Hadoop集成、监控和部署工具。
+ 大量的工具都能集成了kafka。Ecosystem 中列出了许多工具，包括流处理系统、Hadoop集成、监控和部署工具。
  ![kafka生态](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/kafka-ecosystem.png)
 
 kafka为数据生态系统带来了循环系统。它在基础设施的各个组件之间传递消息，为所有客户端提供一致的接口。当与提供消息模式的系统集成时，生产者和消费者之间不再有紧密的耦合，也不需要在它们之间建立任何类型的直连。
@@ -47,7 +47,7 @@ kafka为数据生态系统带来了循环系统。它在基础设施的各个组
 	一个主题上的消息，可以存储在不同分区上。	
 	为什么要多个分区呢? 
  ![消费者群组](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/kafka-2.png)  
-   
+
 **leader & follower**  
 	leader读写，follower读数据。  
 	  
@@ -84,7 +84,7 @@ push vs pull?
         props.put("key.serializer", StringSerializer.class.getName());
         props.put("value.serializer", StringSerializer.class.getName());
         this.producer = new KafkaProducer<String, String>(props);
- ``` 
+```
 2.1.3  **消息发送**  
 1. 同步发送  
 使用 send() 方法发送消息，它会返回一个 Future 对象，调用 get() 方法进行等待，就可以知道消息是否发送成功。
@@ -101,7 +101,7 @@ push vs pull?
    ProducerRecord<String, String> record =
    new ProducerRecord<>("testTopic", "Products2", "USA"); 
    producer.send(record, new DemoProducerCallback());
-```  
+```
 tips: 上述例子都使是单线程，但其实生产者是可以使用多线程来发送消息的。如果需要更高的吞吐量，可以在生产者数量不变的前提下增加线程数量。如果这样做还不够，可以增加生产者数量 。
 
 2.1.4 **分区**  
@@ -223,8 +223,9 @@ while (true) {
 ​ 	acks = 0 生产者在成功写入消息之前不会等待任何来自服务器的响应。生产者不知道消息是否丢失，不过，因为生产者不需要等待服务器的响应，所以它可以以网络能够支持的最大速度发送消息，从而达到很高的吞吐量。
 ​ 	acks = 1 只要集群的首领节点收到消息，生产者就会收到一个来自服务器的成功响应。如果消息无法到达首领节点（比如首领节点崩溃，新的首领还没有被选举出来），生产者会收到一个错误响应，为了避免数据丢失，生产者会重发消息。
 ​	acks = all（-1） 只有当所有参与复制的节点全部收到消息时，生产者才会收到一个来自服务器的成功响应。这种模式是最安全的，它可以保证不止一个服务器收到消息，就算有服务器发生崩溃，整个集群仍然可以运行。不过，它的延迟比 acks=1 时更高，因为需要等待不只一个服务器节点接收消息。
+
  	![Hw&LEO](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/acks.png)  
-	2. buffer.memory
+ 	2. buffer.memory
 该参数用来设置生产者内存缓冲区的大小，生产者用它缓冲要发送到服务器的消息。如果应用程序发送消息的速度超过发送到服务器的速度，会导致生产者空间不足。这个时候，send() 方法调用要么被阻塞，要么抛出异常，取决于如何设置 max.block.ms参数，表示在抛出异常之前可以阻塞多长时间。
 
 3. compression.type    
@@ -266,6 +267,7 @@ tips：Kafka 可以保证同一个分区里的消息是有序的。 如果把 re
 5. auto.offset.reset  
 指定了消费者在读取一个没有偏移量的分区或者偏移量无效的情况下，该作何处理。默认值是 latest.
 tips ：分区没有提交偏移量时才生效  
+
  	![offsetReset.png](https://github.com/xiechengsiii/Java_Notes/blob/master/pics/offsetReset.png)  
 6. enable.auto.commit  
 该属性指定了消费者是否自动提交偏移量，默认值是 true。为了尽量避免出现重复数据和数据丢失 一般设为 false，由自己控制何时提交偏移量
@@ -284,25 +286,25 @@ socket 在读写数据时用到的 TCP 缓冲区也可以设置大小。如果�
 
 2.3.3  **主题相关配置 **  
 1. num.partitions  
-指定新创建的主题将包含多少个分区 。
-tips： 如何选定分区数量？可以从以下几个因素考虑  
-● 主题需要达到多大的吞吐量？  
-● 从单个分区读取数据的最大吞吐量是多少？每个分区一般都会有一个消费者，如果消费者将数据写入数据库的速度不会超过每秒 50MB，那么从个分区读取数据的吞吐量不需要超过每秒 50MB。  
-● 可以通过类似的方法估算生产者向单个分区写入数据的吞吐量，不过生产者的速度一般比消费者快得多，最好为生产者多估算一些吞吐量。  
-● 每个 broker 包含的分区个数、可用的磁盘空间和网络带宽。  
-● 单个 broker 对分区个数是有限制的，因为分区越多，占用的内存越多，完成首领选举需要的时间也越长。  
+   指定新创建的主题将包含多少个分区 。
+   tips： 如何选定分区数量？可以从以下几个因素考虑  
+   ● 主题需要达到多大的吞吐量？  
+   ● 从单个分区读取数据的最大吞吐量是多少？每个分区一般都会有一个消费者，如果消费者将数据写入数据库的速度不会超过每秒 50MB，那么从个分区读取数据的吞吐量不需要超过每秒 50MB。  
+   ● 可以通过类似的方法估算生产者向单个分区写入数据的吞吐量，不过生产者的速度一般比消费者快得多，最好为生产者多估算一些吞吐量。  
+   ● 每个 broker 包含的分区个数、可用的磁盘空间和网络带宽。  
+   ● 单个 broker 对分区个数是有限制的，因为分区越多，占用的内存越多，完成首领选举需要的时间也越长。  
 
     2.log.retention.ms   
-决定数据可以被保留多久，默认值为 168 小时  
+   决定数据可以被保留多久，默认值为 168 小时  
     3. log.retention.bytes  
-通过保留的消息字节数来判断消息是否过期 .比如有一个包含 8 个分区的主题，并且 log.retention.bytes 设为 1GB，那么这个主题最多可以保留 8GB 的数据。
-    
+   通过保留的消息字节数来判断消息是否过期 .比如有一个包含 8 个分区的主题，并且 log.retention.bytes 设为 1GB，那么这个主题最多可以保留 8GB 的数据。
+   
    4.log.segment.bytes  
-日志片段大小达到 log.segment.bytes 指定的上限（默认是 1GB）时，当前日志片段就会被关闭，一个新的日志片段被打开
+   日志片段大小达到 log.segment.bytes 指定的上限（默认是 1GB）时，当前日志片段就会被关闭，一个新的日志片段被打开
    
    5.log.segment.ms  
    指定了多长时间之后日志片段会被关闭
- 
+
   6.message.max.bytes  
 单个消息的最大大小，默认值是 1000000，即1MB。如果生产者尝试发送的消息超过这个大小，不仅消息不会被接收，会收到broker返回的错误信息
 tips1：这个值对性能有显著的影响。值越大，那么负责处理网络连接和请求的线程就需要花越多的时间来处理这些请求。它还会增加磁盘写入块的大小，从而影响 IO 吞吐量
@@ -474,7 +476,7 @@ Topic: topicTest	TopicId: gdCSKlkqTXqmAFZnByYHeQ	PartitionCount: 3	ReplicationFa
 // 查看消费者的情况
 kafka-consumer-groups --bootstrap-server localhost:9092 --group groupA --describe
 ```
- ![消费者脚本输出](httpsgithub.com/xiechengsiii/Java_Notes/blob/master/pics/consumerPrint.png)  
+ ![消费者脚本输出](E:\Typora\imgs\consumerPrint.png)  
 current-offset  当前提交量，表示下次拉取消息时，是从这个位置开始拉取。比如图中对于partion-1，下次拉取offset =  60  的消息  
 log-end-offset  下一条将要被加入的到日志的消息的偏移量  
 
@@ -504,13 +506,13 @@ bin kafka-configs --bootstrap-server localhost:9092 --alter --entity-type topics
 ```
 min.insync.replicas=3的情况下，  此时如果一个broker挂掉，生产者会进行重试。
 重试过程中broker恢复，消费者可能会收到和发送顺序不一致的消息  
- ![顺序不一致](httpsgithub.com/xiechengsiii/Java_Notes/blob/master/pics/消息顺序不一致.png)  
+ ![顺序不一致](https:github.com/xiechengsiii/Java_Notes/blob/master/pics/消息顺序不一致.png)  
 
 解决
 ```
  props.put("max.in.flight.requests.per.connection", 1);
- ```
- 
+```
+
 ### 4 压力测试 
 #### 4.1 测试条件
 单机单partion    
@@ -525,33 +527,42 @@ kafka-producer-perf-test --topic test_perf --num-records 1000000 --record-size 3
 ```
 #### 4.3 测试结果
 producer  
-throughput	record-size/B	num-records/W	实际写入消息数/s	avg latency/ms	95%的消息延迟/ms	max latency/ms
-100	10	1	99.99	0.88	1	229.00
-100	80	1	99.99	0.87	1	259.00
-100	160	1	99.99	0.88	1	240.00
-1000	160	10	999.93	0.53	1	268.00
-2000	160	10	1999.64	0.53	1	272.00
-4000	160	10	3998.72	 0.74	1	222.00
-8000	160	10	7994.24	0.65	1	227.00
-8000	160	100	7999.42	0.62	1	225.00
-8000	320	100	7999.48	0.64	1	222.00
+|throughput|	record-size/B|	num-records/W	|实际写入消息数/s|	avg latency/ms|	95%的消息延迟/ms|	max latency/ms|
+| ---- | ---- | ---- | ---- |---- |---- |---- |
+|100	|10	|1|	99.99	|0.88	|1	|229.00|
+|100	|80	|1	|99.99	|0.87|	1	|259.00|
+|100	|160	|1	|99.99	|0.88	|1	|240.00|
+|1000	|160	|10	|999.93	|0.53|	1	|268.00|
+|2000	|160	|10	|1999.64	|0.53|	1	|272.00
+|4000	|160	|10	|3998.72	 |0.74|	1	|222.00|
+|8000	|160	|10	|7994.24	|0.65	|1	|227.00|
+|8000	|160	|100	|7999.42	|0.62	|1	|225.00|
+|8000	|320	|100	|7999.48	|0.64	|1	|222.00|
 
- 固定 throughput = 1W， num-records = 320B，num-records  = 100W  
- batchSize/B	lingger.ms	records/s	avg latency/ms
-100	0	9999.2	13.92
-1000	0	9999.3	1.71
-10000	0	9999.2	0.61
-10000	10	9999.0	1.86throughput = -1  num-records = 320B，num-records  = 1WbatchSize/B	lingger.ms	records/s	avg latency/ms
-10000	10	27855	21.37
-10000	30	29498	16.21
-10000	50	30959	14.15 
+固定 throughput = 1W， num-records = 320B，num-records  = 100W  
+
+| batchSize/B | lingger.ms | records/s | avg latency/ms |
+| ---- | ---- | ---- | ---- |
+| 100  | 0    | 9999.2 | 13.92 |
+| 1000 | 0    | 9999.3 | 1.71 |
+| 10000 | 0    | 9999.2 | 0.61 |
+|10000	|10|	9999.0|	1.86|
+
+throughput = -1  num-records = 320B，num-records  = 1W
+|batchSize/B	|lingger.ms|	records/s|	avg latency/ms|
+| ---- | ---- | ---- | ---- |
+|10000	|10	|27855	|21.37|
+|10000	|30	|29498	|16.21|
+|10000	|50	|30959|	14.15 |
+
 固定参数 num-records=100W  --record-size =320   batch.size=10000  
-throughput	records（MB/s）	avg latency/ms
-100000	30.49	4.0
-200000	60.99	3.9
-300000	75.07	4.11
-400000	74.78	3.80
-500000	76.01	3.45
+|throughput	|records（MB/s）|	avg latency/ms|
+| ---- | ---- | ---- |
+|100000	|30.49	|4.0|
+|200000|	60.99	|3.9|
+|300000	|75.07	|4.11|
+|400000	|74.78	|3.80|
+|500000|76.01	|3.45||
 
 
 ### 5 参考资料

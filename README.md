@@ -9,6 +9,10 @@
 #### [Redis](/docs/java/Redis.md)
 #### [分布式](/docs/java/分布式.md)
 #### [拾贝](/docs/java/拾贝.md)
+#### [netty](/docs/java/netty.md)
+#### [introduction of kafka](/docs/java/kafka-0.md)
+#### [一些编码规范](/docs/java/coding_suggestions.md)
+#### [coding过程中碰到的问题](/docs/java/碰到的问题.md)
 #### [算法与数据结构](/docs/java/algorithm.md)
 ### 通用知识
 #### 计算机网络
