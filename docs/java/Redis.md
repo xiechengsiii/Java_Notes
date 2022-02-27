@@ -2,9 +2,190 @@
 
 
 
-#### 数据类型
+#### 数据结构与对象
 
+##### simple dynamic string(sds)
 
+简单动态字符串
+
+```java
+struct sdshdr{
+//buff数组中已使用字节的数量
+//等于sds所保存的字符串长度
+int len
+//buff数组冲未使用字节的数量
+int free
+//字节数组，用于保存字符串
+char[] buff
+}
+```
+
+相比C字符串：
+
+1.O(1)获取字符串长度
+
+2.杜绝缓冲区溢出
+
+3.减少修改字符串时带来的内存重新分配次数
+
+内存分配涉及复杂的算法， 并且可能执行系统调用，通常是一个比较耗时的操作。redis作为对速度要求苛刻的db，如果光是执行内存分配就占去修改字符串很大一部分时间，是会对性能造成影响的。
+
+两种分配优化策略：
+
+ **空间预分配**
+
+对sds进行扩展的时候，除了所必须的空间，还会额外分配未使用空间。
+
+在扩展sds前，会先检查未使用空间是否足够，如果足够的话，直接使用未使用空间，而无需执行内存重分配。因此这种策略将sds连续增长N次字符串所需要的内存重新分配次数从必为N次降为最多N次。
+
+**惰性空间释放**
+
+对sds的字符串缩短操作，并不立即回收缩短后多出来的字节空间，而用free属性将这些字节记录下来，等待将来使用。
+
+4.二进制安全
+
+##### 链表
+
+```java
+typedef struct listNode{
+struct listNode *prev;
+struct listNode * mext;
+void *value;
+}
+typedef struct list{
+//头结点
+listNode *head;
+//尾结点
+listNode *tail;
+//链表所包含的节点数量
+unsigned long len
+//节点值复制函数
+void *(*dup)(void *ptr)
+//节点值释放函数
+void (*free)(void *ptr);
+//节点值对比函数
+int (*match)(void *ptr, void *key);
+}
+```
+
+总之，redis的链表，特性可以总结为双端，无环，带有表头和表尾指针，链表长度计数器，多态。
+
+##### 字典
+
+数据结构定义见《redis设计与实现》
+
+redis中的cow
+
+fork()之后，kernel把父进程中所有的内存页的权限都设为read-only，然后子进程的地址空间指向父进程。当父子进程都只读内存时，相安无事。当其中某个进程写内存时，CPU硬件检测到内存页是read-only的，于是触发页异常中断（page-fault），陷入kernel的一个中断例程。中断例程中，kernel就会把触发的异常的页复制一份，于是父子进程各自持有独立的一份。
+
+CopyOnWrite的好处： 1、减少分配和复制资源时带来的瞬时延迟； 2、减少不必要的资源分配； CopyOnWrite的缺点： 1、如果父子进程都需要进行大量的写操作，会产生大量的分页错误（页异常中断page-fault）
+
+1.Redis在持久化时，如果是采用BGSAVE命令或者BGREWRITEAOF的方式，那Redis会fork出一个子进程来读取数据，写到磁盘中。
+
+2.总体来看，Redis还是读操作比较多。如果子进程存在期间，发生了大量的写操作，那可能就会出现很多的分页错误(页异常中断page-fault)，这样就得耗费不少性能在复制上。
+
+而在rehash阶段上，写操作是无法避免的。所以Redis在fork出子进程之后，将负载因子阈值提高（执行BGSAVE 或者BGREWRITEAOF 时，负载因子由1提高至5），尽量减少写操作，避免不必要的内存写入操作，最大限度地节约内存
+
+#####  跳跃表
+
+redis只在两个地方用到跳表，一个是实现有序集合建，一个在集群节点中用做内部数据结构。
+
+##### 整数集合
+
+##### 压缩列表
+
+##### 对象
+
+基于上述多种数据结构，redis有五种对象系统：字符串对象，列表，对象哈希对象，集合对象，有序集合对象。针对不同的场景，可以为对象设置不同的数据结构实现，从而优化对象在不同场景下的使用效率。
+
+#### redis 集群
+
+##### redis集群的搭建
+
+eg: 创建一个3节点的集群， 每隔节点的复制系数是2
+
+```java
+//1. 6个实例的端口号
+mkdir cluster-test
+cd cluster-test
+mkdir 7000 7001 7002 7003 7004 7005
+// 2. touch redis.config
+port 7000
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes
+// 2. 将redis.conf cp 到6个文件夹中，注意端口号需要修改为对应的端口号
+echo 7000 7001 7002 7003 7004 7005 | xargs -n 1 cp redis.conf
+// 3. 启动对应实例
+redis-server /Users/xiecsssss/cluster-test/7004/redis.conf
+....
+// 4. 创建集群
+redis-cli --cluster create --cluster-replicas 1 
+127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
+```
+
+命令台输出：
+
+```java
+>>> Trying to optimize slaves allocation for anti-affinity
+[WARNING] Some slaves are in the same host as their master
+M: bc18ff46b77b22135b1ecac7e65489e9eea6a45e 127.0.0.1:7000
+   slots:[0-5460] (5461 slots) master
+M: 9d1218785e706136469ca6f4581ce1959ae43922 127.0.0.1:7001
+   slots:[5461-10922] (5462 slots) master
+M: 2880b03e2a32c0f65a6bd516ed1affb0222c52ad 127.0.0.1:7002
+   slots:[10923-16383] (5461 slots) master
+S: 51f7315d934c9ee5d74daf91ce93a03470a65e01 127.0.0.1:7003
+   replicates bc18ff46b77b22135b1ecac7e65489e9eea6a45e
+S: 2c976d832e4148077f8e6e064dda4c81f20cffda 127.0.0.1:7004
+   replicates 9d1218785e706136469ca6f4581ce1959ae43922
+S: c8a0fb05b584248dfbff1abb7b0feaef3e733656 127.0.0.1:7005
+   replicates 2880b03e2a32c0f65a6bd516ed1affb0222c52ad
+Can I set the above configuration? (type 'yes' to accept): yes
+
+//YES
+>>> Performing Cluster Check (using node 127.0.0.1:7000)
+M: bc18ff46b77b22135b1ecac7e65489e9eea6a45e 127.0.0.1:7000
+   slots:[0-5460] (5461 slots) master
+   1 additional replica(s)
+M: 2880b03e2a32c0f65a6bd516ed1affb0222c52ad 127.0.0.1:7002
+   slots:[10923-16383] (5461 slots) master
+   1 additional replica(s)
+S: 51f7315d934c9ee5d74daf91ce93a03470a65e01 127.0.0.1:7003
+   slots: (0 slots) slave
+   replicates bc18ff46b77b22135b1ecac7e65489e9eea6a45e
+S: c8a0fb05b584248dfbff1abb7b0feaef3e733656 127.0.0.1:7005
+   slots: (0 slots) slave
+   replicates 2880b03e2a32c0f65a6bd516ed1affb0222c52ad
+S: 2c976d832e4148077f8e6e064dda4c81f20cffda 127.0.0.1:7004
+   slots: (0 slots) slave
+   replicates 9d1218785e706136469ca6f4581ce1959ae43922
+M: 9d1218785e706136469ca6f4581ce1959ae43922 127.0.0.1:7001
+   slots:[5461-10922] (5462 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+```
+
+这样集群就搭建成功 验证：
+
+```java
+redis-cli -c -p 7000
+127.0.0.1:7000> set testkey testvalue
+OK
+127.0.0.1:7000> get testname
+-> Redirected to slot [15494] located at 127.0.0.1:7002
+(nil) 
+```
+
+对集群的支持是非常基本的， 所以它总是依靠 Redis 集群节点来将它转向（redirect）至正确的节点。好的实现是应该用缓存记录起哈希槽与节点地址之间的映射（map）， 从而直接将命令发送到正确的节点上面。
+
+其余的诸如重新分片的操作 详见 http://redisdoc.com/topic/cluster-tutorial.html
+
+#### 故障转移
 
 #### 为何redis单线程却效率高
 
@@ -225,3 +406,7 @@ redis的事务是不支持**roll back**的，因而不满足原子性
   <font color = red>这里其实并没有保证实时的一致性，只保证了最终的一致性啊？</font>
 
   网上有人的回答：暂时不对外提供服务，直到数据同步再恢复。可用性和一致性不可兼得。
+
+### 参考
+
+- redis 设计与实现
