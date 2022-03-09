@@ -1,7 +1,7 @@
 
 
 ### Java相关
-#### [javaBase](/docs/tech/javaBase.md)
+#### [java](/docs/tech/javaBase.md)
 #### [MySQL](/docs/tech/MySQL.md)
 #### [JUC](/docs/tech/JUC.md)
 #### [JVM](/docs/tech/JVM.md)
@@ -14,6 +14,9 @@
 #### [一些编码习惯](/docs/tech/coding_suggestions.md)
 #### [coding过程中碰到的问题](/docs/tech/碰到的问题.md)
 #### [算法与数据结构](/docs/tech/algorithm.md)
+#### [web](/docs/tech/web.md)
+#### [LeetCode](/docs/tech/leetCode.md)
+#### [Git相关](/docs/tech/git.md)
 #### [运维相关](/docs/tech/运维相关.md)
 ### 通用知识
 #### 计算机网络

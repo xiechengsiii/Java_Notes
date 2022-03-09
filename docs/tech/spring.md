@@ -82,7 +82,39 @@ bankInfoService.updateById(ksOnboardingBankInfo);
 
 4. spirng 可以通过注解 @`RestControllerAdvice`  + `@ExceptionHandler`统一处理各种异常
 
+5.spring存在的循环依赖问题
+
+使用A这个类，加上``@Autowired``注解报错，无法穿件这个类；
+
+改成：
+
+```java
+ private A getA() {
+        if (a == null) {
+            a = applicationContext.getBean(a.class);
+        }
+        return a;
+    }
+```
+
+即可解决。在需要要到A这个类的时候，手动调用``getA``即可
+
+方法2
+
+```java
+class ClassUsedA{
+  @Autowired
+  @Lazy
+  private A a
+}
+```
+
+加上``@Lazy``注解即可。
+
+
+
 ##### AOP
+
 几个术语
 
 1. 连接点  Joinpoint
