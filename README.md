@@ -1,19 +1,20 @@
 
 
 ### Java相关
-#### [javaBase](/docs/java/javaBase.md)
-#### [MySQL](/docs/java/MySQL.md)
-#### [JUC](/docs/java/JUC.md)
-#### [JVM](/docs/java/JVM.md)
-#### [Spring](/docs/java/spring.md)
-#### [Redis](/docs/java/Redis.md)
-#### [分布式](/docs/java/分布式.md)
-#### [拾贝](/docs/java/拾贝.md)
-#### [netty](/docs/java/netty.md)
-#### [introduction of kafka](/docs/java/kafka-0.md)
-#### [一些编码规范](/docs/java/coding_suggestions.md)
-#### [coding过程中碰到的问题](/docs/java/碰到的问题.md)
-#### [算法与数据结构](/docs/java/algorithm.md)
+#### [javaBase](/docs/tech/javaBase.md)
+#### [MySQL](/docs/tech/MySQL.md)
+#### [JUC](/docs/tech/JUC.md)
+#### [JVM](/docs/tech/JVM.md)
+#### [Spring](/docs/tech/spring.md)
+#### [Redis](/docs/tech/Redis.md)
+#### [分布式](/docs/tech/分布式.md)
+#### [拾贝](/docs/tech/拾贝.md)
+#### [netty](/docs/tech/netty.md)
+#### [introduction of kafka](/docs/tech/kafka-0.md)
+#### [一些编码习惯](/docs/tech/coding_suggestions.md)
+#### [coding过程中碰到的问题](/docs/tech/碰到的问题.md)
+#### [算法与数据结构](/docs/tech/algorithm.md)
+#### [运维相关](/docs/tech/运维相关.md)
 ### 通用知识
 #### 计算机网络
 ##### [物理层&&数据链路层](/docs/计算机基础/计算机网络_0.md)

@@ -212,10 +212,46 @@ Queue<Integer> pq = new  PriorityQueue<>((a, b) -> b - a);
    System.out.print(i == j); //false
    Integer i = 100;// 自动装箱  Integer.valurOf(i)  如果在[-128,127]， 直接返回常量池的对象
    Integer j = 100;
-   System.out.print(i == j); //true  常量缓冲池  
+   System.out.print(i == j); //true  常量缓冲池  非静态匿名内部类可能导致的内存泄， 静态匿名内部类可以解决。
    ```
 
+   10 . 使用集合的时候，比如map， list，最好先指定容量，减少扩容次数，避免频繁扩容或者rehash带来的性能下降。
    
+   ```java
+   //对于list
+   public class EnsureCapacityTest {
+   	public static void main(String[] args) {
+   		ArrayList<Object> list = new ArrayList<Object>();
+   		final int N = 10000000;
+   		long startTime = System.currentTimeMillis();
+   		for (int i = 0; i < N; i++) {
+   			list.add(i);
+   		}
+   		long endTime = System.currentTimeMillis();
+   		System.out.println("使用ensureCapacity方法前："+(endTime - startTime));
+   
+   	}
+   }
+   //运行结果  使用ensureCapacity方法前：2158
+   
+   public class EnsureCapacityTest {
+       public static void main(String[] args) {
+           ArrayList<Object> list = new ArrayList<Object>();
+           final int N = 10000000;
+           list = new ArrayList<Object>();
+           long startTime1 = System.currentTimeMillis();
+           list.ensureCapacity(N);
+           for (int i = 0; i < N; i++) {
+               list.add(i);
+           }
+           long endTime1 = System.currentTimeMillis();
+           System.out.println("使用ensureCapacity方法后："+(endTime1 - startTime1));
+       }
+   }
+   // 使用ensureCapacity方法后：1773
+   ```
+   
+   对于map，可以使用带有初始容量的构造方法。
 
 
 
